@@ -11,7 +11,7 @@ import { DoctorResponse, DepartmentOption } from '../../models/doctor';
   templateUrl: './doctor-search.html',
   styleUrls: ['./doctor-search.css']
 })
-export class DoctorSearchComponent implements OnInit {
+export class DoctorSearch implements OnInit {
   private doctorService = inject(DoctorService);
 
   selectedDepartment = signal<number | null>(null);

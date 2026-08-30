@@ -1,10 +1,9 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { DoctorSearchComponent } from "./components/doctor-search/doctor-search";
+import { DoctorSearch } from "./components/doctor-search/doctor-search";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, DoctorSearchComponent],
+  imports: [ DoctorSearch],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
