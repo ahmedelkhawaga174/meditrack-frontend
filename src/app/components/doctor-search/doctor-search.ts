@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DoctorService } from '../../services/doctor';
 import { DoctorResponse, DepartmentOption } from '../../models/doctor';
+import { Router} from "@angular/router";
 
 @Component({
   selector: 'app-doctor-search',
@@ -13,6 +14,7 @@ import { DoctorResponse, DepartmentOption } from '../../models/doctor';
 })
 export class DoctorSearch implements OnInit {
   private doctorService = inject(DoctorService);
+  private router = inject(Router);
 
   selectedDepartment = signal<number | null>(null);
   selectedDate = signal<string>('');
@@ -57,4 +59,7 @@ export class DoctorSearch implements OnInit {
     this.selectedDate.set(today);
     this.searchDoctors();
   }
+  viewDoctorDetails(doctorId: number): void {
+  this.router.navigate(['/doctors', doctorId]);
+}
 }
