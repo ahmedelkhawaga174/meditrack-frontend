@@ -64,7 +64,17 @@
                   </span>
                 }
               </div>
+              <!-- view details button -->
             </div>
+                <button
+            (click)="viewDoctorDetails(doctor.id)"
+            class="w-full mt-5 bg-blue-600 hover:bg-blue-700
+                   text-white px-4 py-2 rounded-md
+                   font-medium transition">
+
+            View Details
+
+          </button>
           </div>
         }
       </div>
@@ -74,4 +84,6 @@
       </div>
     }
   }
+  
 </div>
+
