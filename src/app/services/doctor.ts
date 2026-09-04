@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { DoctorResponse } from '../models/doctor';
+import { PendingReferralResponse } from '../models/pending-referral-reponse';
 
 @Injectable({
   providedIn: 'root'
@@ -26,5 +27,10 @@ export class DoctorService {
 
     getDoctorById(id: number): Observable<DoctorResponse> {
     return this.http.get<DoctorResponse>(`${this.apiUrl}/${id}`);
+  }
+
+  getPendingReferrals(doctorId: number = 1): Observable<PendingReferralResponse[]> {
+    const params = new HttpParams().set('doctorId', doctorId.toString());
+    return this.http.get<PendingReferralResponse[]>(`${this.apiUrl}/referrals/pending`, { params });
   }
 }
