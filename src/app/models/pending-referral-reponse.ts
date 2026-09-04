@@ -1,4 +1,4 @@
-export interface PendingReferral {
+export interface PendingReferralResponse {
   id: number;
   patientId: number;
   patientName: string;
