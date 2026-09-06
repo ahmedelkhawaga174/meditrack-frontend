@@ -13,6 +13,9 @@ describe('PatientAppointments', () => {
 
     fixture = TestBed.createComponent(PatientAppointments);
     component = fixture.componentInstance;
+
+    fixture.componentRef.setInput('patientId', 1);
+
     await fixture.whenStable();
   });
 
