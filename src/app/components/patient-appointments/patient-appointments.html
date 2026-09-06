@@ -1,0 +1,75 @@
+<div class="max-w-4xl mx-auto p-6">
+  <h2 class="text-2xl font-bold mb-6 text-gray-800">My Appointments</h2>
+
+  <div class="flex gap-2 mb-6">
+    <button
+      (click)="activeTab.set('upcoming')"
+      [class]="activeTab() === 'upcoming'
+        ? 'bg-blue-600 text-white px-4 py-2 rounded-md font-medium'
+        : 'bg-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium'">
+      Upcoming
+    </button>
+    <button
+      (click)="activeTab.set('past')"
+      [class]="activeTab() === 'past'
+        ? 'bg-blue-600 text-white px-4 py-2 rounded-md font-medium'
+        : 'bg-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium'">
+      Past
+    </button>
+  </div>
+
+  @if (isLoading()) {
+  <div class="text-center py-10 text-gray-500">
+    <p>Loading appointments...</p>
+  </div>
+  } @else {
+  @if (activeTab() === 'upcoming') {
+  @if (upcoming().length > 0) {
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    @for (appt of upcoming(); track appt.appointmentId) {
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-lg font-bold text-gray-900">Dr. {{ appt.doctorName }}</h3>
+        <span [class]="statusClasses(appt.status)">{{ appt.status }}</span>
+      </div>
+      <p class="text-sm text-gray-600 mb-1">{{ appt.specialization }} · {{ appt.departmentName }}</p>
+      <p class="text-sm text-gray-500">{{ appt.date }} · {{ appt.startTime }} – {{ appt.endTime }}</p>
+      @if (appt.notes) {
+      <p class="text-xs italic text-gray-400 mt-2">{{ appt.notes }}</p>
+      }
+    </div>
+    }
+  </div>
+  } @else {
+  <div class="bg-white rounded-lg border border-dashed border-gray-300 p-12 text-center">
+    <p class="text-gray-500 font-medium">No upcoming appointments.</p>
+  </div>
+  }
+  } @else {
+  @if (past().length > 0) {
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    @for (appt of past(); track appt.appointmentId) {
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-lg font-bold text-gray-900">Dr. {{ appt.doctorName }}</h3>
+        <span [class]="statusClasses(appt.status)">{{ appt.status }}</span>
+      </div>
+      <p class="text-sm text-gray-600 mb-1">{{ appt.specialization }} · {{ appt.departmentName }}</p>
+      <p class="text-sm text-gray-500">{{ appt.date }} · {{ appt.startTime }} – {{ appt.endTime }}</p>
+    </div>
+    }
+  </div>
+  } @else {
+  <div class="bg-white rounded-lg border border-dashed border-gray-300 p-12 text-center">
+    <p class="text-gray-500 font-medium">No past appointments.</p>
+  </div>
+  }
+  }
+  }
+
+  @if (error()) {
+  <div class="bg-red-50 text-red-700 border border-red-200 rounded-md p-4 mt-4">
+    {{ error() }}
+  </div>
+  }
+</div>
