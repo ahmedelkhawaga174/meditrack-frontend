@@ -1,0 +1,379 @@
+<div class="min-h-screen bg-slate-50 p-6">
+
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+      <div>
+        <h1 class="text-3xl font-bold text-slate-800">
+          Receptionist Dashboard
+        </h1>
+        <p class="text-slate-500 mt-1">
+          Check in patients and manage the waiting queue.
+        </p>
+      </div>
+
+      <button
+        (click)="refresh()"
+        class="bg-slate-800 hover:bg-slate-900 text-white
+               px-5 py-2.5 rounded-lg font-medium transition">
+        Refresh
+      </button>
+    </div>
+
+    <!-- Messages -->
+    @if (message) {
+    <div class="mb-6 p-4 bg-green-50 border border-green-200
+                  text-green-700 rounded-lg">
+      {{ message }}
+    </div>
+    }
+
+    @if (error) {
+    <div class="mb-6 p-4 bg-red-50 border border-red-200
+                  text-red-700 rounded-lg">
+      {{ error }}
+    </div>
+    }
+
+
+    <!-- Check In Patient -->
+    <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+
+      <div class="mb-5">
+        <h2 class="text-xl font-bold text-slate-800">
+          Check In Patient
+        </h2>
+
+        <p class="text-sm text-slate-500 mt-1">
+          Confirmed appointments can be checked in.
+        </p>
+      </div>
+
+      @if (appointments.length > 0) {
+
+      <div class="overflow-x-auto">
+
+        <table class="w-full text-left">
+
+          <thead>
+          <tr class="border-b border-slate-200 text-sm text-slate-500">
+            <th class="py-3 px-4">Appointment</th>
+            <th class="py-3 px-4">Patient</th>
+            <th class="py-3 px-4">Doctor</th>
+            <th class="py-3 px-4">Status</th>
+            <th class="py-3 px-4 text-right">Action</th>
+          </tr>
+          </thead>
+
+          <tbody class="divide-y divide-slate-100">
+
+          @for (appointment of appointments; track appointment.id) {
+
+          <tr class="hover:bg-slate-50">
+
+            <td class="py-4 px-4 font-medium text-slate-800">
+              #{{ appointment.id }}
+            </td>
+
+            <td class="py-4 px-4 text-slate-600">
+              Patient #{{ appointment.patientId }}
+            </td>
+
+            <td class="py-4 px-4 text-slate-600">
+              Doctor #{{ appointment.doctorId }}
+            </td>
+
+            <td class="py-4 px-4">
+
+                    <span
+                      [class]="
+                        appointment.status === 'CONFIRMED'
+                          ? 'bg-blue-100 text-blue-800'
+                          : appointment.status === 'CHECKED_IN'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-slate-100 text-slate-600'
+                      "
+                      class="inline-flex px-3 py-1 rounded-full
+                             text-xs font-semibold">
+
+                      {{ appointment.status }}
+
+                    </span>
+
+            </td>
+
+            <td class="py-4 px-4 text-right">
+
+              @if (appointment.status === 'CONFIRMED') {
+
+              <button
+                (click)="checkIn(appointment)"
+                [disabled]="loading"
+                class="bg-blue-600 hover:bg-blue-700
+                               disabled:bg-blue-300
+                               text-white px-4 py-2 rounded-lg
+                               text-sm font-medium transition">
+
+                Check In
+
+              </button>
+
+              } @else if (appointment.status === 'CHECKED_IN') {
+
+              <span class="text-green-600 text-sm font-medium">
+                        Checked In
+                      </span>
+
+              } @else {
+
+              <span class="text-slate-400 text-sm">
+                        Not eligible
+                      </span>
+
+              }
+
+            </td>
+
+          </tr>
+
+          }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      } @else {
+
+      <div class="py-10 text-center text-slate-500">
+        No appointments found.
+      </div>
+
+      }
+
+    </section>
+
+
+    <!-- Waiting Queue -->
+    <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+
+      <div class="flex flex-col md:flex-row md:items-center
+                  md:justify-between gap-4 mb-6">
+
+        <div>
+          <h2 class="text-xl font-bold text-slate-800">
+            Waiting Queue
+          </h2>
+
+          <p class="text-sm text-slate-500 mt-1">
+            Manage patients waiting to see the doctor.
+          </p>
+        </div>
+
+        <span class="bg-blue-100 text-blue-800
+                     px-3 py-1 rounded-full text-sm font-semibold">
+          {{ queue.length }} Patients
+        </span>
+
+      </div>
+
+
+      <!-- Add appointment to queue -->
+
+      <div class="bg-slate-50 rounded-lg p-4 mb-6">
+
+        <h3 class="font-semibold text-slate-700 mb-3">
+          Add Appointment to Queue
+        </h3>
+
+        <div class="flex flex-col sm:flex-row gap-3">
+
+          <input
+            type="number"
+            [(ngModel)]="appointmentId"
+            placeholder="Appointment ID"
+            class="flex-1 border border-slate-300 rounded-lg
+                   px-4 py-2.5 focus:outline-none
+                   focus:ring-2 focus:ring-blue-500">
+
+          <button
+            (click)="addAppointmentToQueue()"
+            [disabled]="loading"
+            class="bg-blue-600 hover:bg-blue-700
+                   disabled:bg-blue-300
+                   text-white px-5 py-2.5 rounded-lg
+                   font-medium transition">
+
+            Add to Queue
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- Queue table -->
+
+      @if (queue.length > 0) {
+
+      <div class="overflow-x-auto">
+
+        <table class="w-full text-left">
+
+          <thead>
+
+          <tr class="border-b border-slate-200
+                         text-sm text-slate-500">
+
+            <th class="py-3 px-4">Position</th>
+            <th class="py-3 px-4">Patient</th>
+            <th class="py-3 px-4">Doctor</th>
+            <th class="py-3 px-4">Status</th>
+            <th class="py-3 px-4">Checked In</th>
+            <th class="py-3 px-4 text-right">Actions</th>
+
+          </tr>
+
+          </thead>
+
+
+          <tbody class="divide-y divide-slate-100">
+
+          @for (entry of queue; track entry.id) {
+
+          <tr class="hover:bg-slate-50">
+
+            <td class="py-4 px-4">
+
+                    <span class="font-bold text-slate-800">
+                      #{{ entry.queuePosition }}
+                    </span>
+
+            </td>
+
+            <td class="py-4 px-4 text-slate-600">
+              Patient #{{ entry.patientId }}
+            </td>
+
+            <td class="py-4 px-4 text-slate-600">
+              Doctor #{{ entry.doctorId }}
+            </td>
+
+            <td class="py-4 px-4">
+
+                    <span
+                      class="inline-flex px-3 py-1 rounded-full
+                             text-xs font-semibold"
+                      [class]="
+                        entry.status === 'WAITING'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : entry.status === 'CALLED'
+                          ? 'bg-blue-100 text-blue-800'
+                          : entry.status === 'IN_CONSULTATION'
+                          ? 'bg-purple-100 text-purple-800'
+                          : entry.status === 'COMPLETED'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      ">
+
+                      {{ entry.status }}
+
+                    </span>
+
+            </td>
+
+            <td class="py-4 px-4 text-sm text-slate-500">
+              {{ entry.checkedInAt | date:'short' }}
+            </td>
+
+            <td class="py-4 px-4 text-right">
+
+              @if (entry.status === 'WAITING') {
+
+              <button
+                (click)="updateQueueStatus(entry, 'CALLED')"
+                [disabled]="loading"
+                class="bg-blue-600 hover:bg-blue-700
+                               disabled:bg-blue-300
+                               text-white px-3 py-2 rounded-lg
+                               text-sm font-medium">
+
+                Call
+
+              </button>
+
+              }
+
+              @else if (entry.status === 'CALLED') {
+
+              <button
+                (click)="updateQueueStatus(entry, 'IN_CONSULTATION')"
+                [disabled]="loading"
+                class="bg-purple-600 hover:bg-purple-700
+                               disabled:bg-purple-300
+                               text-white px-3 py-2 rounded-lg
+                               text-sm font-medium">
+
+                Start Consultation
+
+              </button>
+
+              }
+
+              @else if (entry.status === 'IN_CONSULTATION') {
+
+              <button
+                (click)="updateQueueStatus(entry, 'COMPLETED')"
+                [disabled]="loading"
+                class="bg-green-600 hover:bg-green-700
+                               disabled:bg-green-300
+                               text-white px-3 py-2 rounded-lg
+                               text-sm font-medium">
+
+                Complete
+
+              </button>
+
+              }
+
+              @else {
+
+              <span class="text-slate-400 text-sm">
+                        No action
+                      </span>
+
+              }
+
+            </td>
+
+          </tr>
+
+          }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      } @else {
+
+      <div class="py-12 text-center
+                    border border-dashed border-slate-300 rounded-lg">
+
+        <p class="text-slate-500">
+          The waiting queue is empty.
+        </p>
+
+      </div>
+
+      }
+
+    </section>
+
+  </div>
+
+</div>
