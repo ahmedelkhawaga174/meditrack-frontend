@@ -4,11 +4,16 @@ import { DoctorSearch } from './components/doctor-search/doctor-search';
 import { PendingReferrals } from './components/pending-referrals/pending-referrals';
 import { PatientAppointments } from './components/patient-appointments/patient-appointments';
 import { ReceptionistDashboard } from './components/receptionist-dashboard/receptionist-dashboard';
+import { PatientMedicalHistory } from './components/patient-medical-history/patient-medical-history';
 
 export const routes: Routes = [
   {
     path: 'doctors/referrals/pending',
     component: PendingReferrals,
+  },
+  {
+    path: 'patients/:patientId/medical-history',
+    component: PatientMedicalHistory
   },
 
   {
