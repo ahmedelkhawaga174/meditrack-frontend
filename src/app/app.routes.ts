@@ -21,10 +21,6 @@ export const routes: Routes = [
     component: Consultation,
   },
   {
-    path: 'consultations',
-    component: Consultation,
-  },
-  {
     path: 'doctors/:doctorId',
     component: DoctorDetails,
   },
