@@ -5,6 +5,7 @@ import { PendingReferrals } from './components/pending-referrals/pending-referra
 import { PatientAppointments } from './components/patient-appointments/patient-appointments';
 import { ReceptionistDashboard } from './components/receptionist-dashboard/receptionist-dashboard';
 import { PatientMedicalHistory } from './components/patient-medical-history/patient-medical-history';
+import { Consultation } from './components/consultation/consultation';
 
 export const routes: Routes = [
   {
@@ -15,7 +16,14 @@ export const routes: Routes = [
     path: 'patients/:patientId/medical-history',
     component: PatientMedicalHistory
   },
-
+  {
+    path: 'consultations/:id',
+    component: Consultation,
+  },
+  {
+    path: 'consultations',
+    component: Consultation,
+  },
   {
     path: 'doctors/:doctorId',
     component: DoctorDetails,
@@ -25,10 +33,10 @@ export const routes: Routes = [
     path: 'patients/:patientId/appointments',
     component: PatientAppointments,
   },
-{
-  path: 'receptionist',
-  component: ReceptionistDashboard,
-},
+  {
+    path: 'receptionist',
+    component: ReceptionistDashboard,
+  },
 
   {
     path: '**',
