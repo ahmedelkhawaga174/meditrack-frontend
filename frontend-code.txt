@@ -1,0 +1,1012 @@
+﻿
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\app.config.ts ====================
+
+import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
+
+import { routes } from './app.routes';
+import { provideHttpClient } from '@angular/common/http';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideBrowserGlobalErrorListeners(),
+    provideHttpClient(),
+    provideRouter(routes, withComponentInputBinding(),),
+     
+  ]
+};
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\app.css ====================
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\app.html ====================
+
+<router-outlet></router-outlet>
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\app.routes.ts ====================
+
+import { Routes } from '@angular/router';
+import { DoctorDetails } from './components/doctor-details/doctor-details';
+import { DoctorSearch } from './components/doctor-search/doctor-search';
+import { PendingReferrals } from './components/pending-referrals/pending-referrals';
+import { PatientAppointments } from './components/patient-appointments/patient-appointments';
+
+export const routes: Routes = [
+  {
+    path: 'doctors/referrals/pending',
+    component: PendingReferrals,
+  },
+
+  {
+    path: 'doctors/:doctorId',
+    component: DoctorDetails,
+  },
+  {
+    path: '**',
+    component: DoctorSearch,
+  },
+  {
+    path: 'patients/:patientId/appointments',
+    component: PatientAppointments
+  },
+];
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\app.spec.ts ====================
+
+import { TestBed } from '@angular/core/testing';
+import { App } from './app';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+
+describe('App', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [App],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting()
+      ]
+    }).compileComponents();
+  });
+
+  it('should create the app', () => {
+    const fixture = TestBed.createComponent(App);
+    const app = fixture.componentInstance;
+    expect(app).toBeTruthy();
+  });
+
+  // it('should render title', async () => {
+  //   const fixture = TestBed.createComponent(App);
+  //   fixture.detectChanges();
+  //   await fixture.whenStable();
+  //   const compiled = fixture.nativeElement as HTMLElement;
+  //   expect(compiled.querySelector('h2')?.textContent).toContain('Search Available Doctors');
+  // });
+});
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\app.ts ====================
+
+import { Component, signal } from '@angular/core';
+import { DoctorSearch } from "./components/doctor-search/doctor-search";
+import { DoctorDetails } from "./components/doctor-details/doctor-details";
+import { RouterOutlet } from "@angular/router";
+
+@Component({
+  selector: 'app-root',
+    standalone: true,
+  imports: [DoctorSearch, DoctorDetails, RouterOutlet],
+  templateUrl: './app.html',
+  styleUrl: './app.css'
+})
+export class App {
+  protected readonly title = signal('meditrack-frontend');
+}
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\components\doctor-details\doctor-details.css ====================
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\components\doctor-details\doctor-details.html ====================
+
+<div class="max-w-6xl mx-auto p-6">
+
+  <h2 class="text-2xl font-bold mb-6 text-gray-800">
+    Doctor Information
+  </h2>
+
+  @if (isLoading()) {
+
+    <div class="bg-white rounded-lg shadow p-10 text-center">
+      <p class="text-gray-500">
+        Loading doctor information...
+      </p>
+    </div>
+
+  } @else if (error()) {
+
+    <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+      <p class="text-red-600 font-medium">
+        {{ error() }}
+      </p>
+    </div>
+
+  } @else if (doctor(); as d) {
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">
+            Dr. {{ d.firstName }} {{ d.lastName }}
+          </h1>
+
+          <p class="text-gray-600 mt-1">
+            {{ d.specialization }}
+          </p>
+        </div>
+
+        <span
+          class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full font-semibold w-fit">
+          {{ d.departmentName }}
+        </span>
+
+      </div>
+
+      <div class="border-t pt-5">
+
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+          Doctor Details
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <div class="bg-gray-50 rounded-lg p-4">
+            <p class="text-xs font-semibold text-gray-500 mb-1">
+              Full Name
+            </p>
+
+            <p class="text-gray-900 font-medium">
+              Dr. {{ d.firstName }} {{ d.lastName }}
+            </p>
+          </div>
+
+
+          <div class="bg-gray-50 rounded-lg p-4">
+            <p class="text-xs font-semibold text-gray-500 mb-1">
+              Specialization
+            </p>
+
+            <p class="text-gray-900 font-medium">
+              {{ d.specialization }}
+            </p>
+          </div>
+
+
+          <div class="bg-gray-50 rounded-lg p-4">
+            <p class="text-xs font-semibold text-gray-500 mb-1">
+              Department
+            </p>
+
+            <p class="text-gray-900 font-medium">
+              {{ d.departmentName }}
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="border-t mt-6 pt-5">
+
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+          Available Slots
+        </h3>
+
+        @if (d.availableSlots.length > 0) {
+
+          <div class="flex flex-wrap gap-3">
+
+            @for (slot of d.availableSlots; track slot.id) {
+
+              <div
+                class="bg-green-50 text-green-700 border border-green-200
+                       px-4 py-2 rounded-lg text-sm font-medium">
+
+                {{ slot.startTime.substring(0, 5) }}
+                -
+                {{ slot.endTime.substring(0, 5) }}
+
+              </div>
+
+            }
+
+          </div>
+
+        } @else {
+
+          <div
+            class="bg-gray-50 border border-dashed border-gray-300
+                   rounded-lg p-6 text-center">
+
+            <p class="text-gray-500">
+              No available slots for this doctor.
+            </p>
+
+          </div>
+
+        }
+
+      </div>
+
+    </div>
+
+  }
+
+</div>
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\components\doctor-details\doctor-details.spec.ts ====================
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { DoctorDetails } from './doctor-details';
+import { DoctorService } from '../../services/doctor';
+import { of } from 'rxjs';
+import { vi } from 'vitest';
+
+describe('DoctorDetails', () => {
+
+  let component: DoctorDetails;
+  let fixture: ComponentFixture<DoctorDetails>;
+
+  beforeEach(async () => {
+
+    const spy = {
+      getDoctorById: vi.fn().mockReturnValue(of(null))
+    };
+
+    await TestBed.configureTestingModule({
+      imports: [DoctorDetails],
+      providers: [
+        {
+          provide: DoctorService,
+          useValue: spy
+        }
+      ]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(DoctorDetails);
+
+    fixture.componentRef.setInput('doctorId', 1);
+
+    component = fixture.componentInstance;
+
+    fixture.detectChanges();
+
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+});
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\components\doctor-details\doctor-details.ts ====================
+
+import { Component, inject, input, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { DoctorResponse } from '../../models/doctor';
+import { DoctorService } from '../../services/doctor';
+
+@Component({
+  selector: 'app-doctor-details',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './doctor-details.html',
+  styleUrl: './doctor-details.css',
+})
+export class DoctorDetails {
+
+  private doctorService = inject(DoctorService);
+
+  doctorId = input.required<number>();
+
+  doctor = signal<DoctorResponse | null>(null);
+  isLoading = signal(true);
+  error = signal('');
+
+  ngOnInit(): void {
+    this.loadDoctor();
+  }
+
+  loadDoctor(): void {
+    this.isLoading.set(true);
+    this.error.set('');
+
+    this.doctorService.getDoctorById(this.doctorId()).subscribe({
+      next: (data) => {
+        this.doctor.set(data);
+        this.isLoading.set(false);
+      },
+
+      error: (err) => {
+        console.error(err);
+
+        this.error.set('Unable to load doctor information.');
+        this.isLoading.set(false);
+      }
+    });
+  }
+}
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\components\doctor-search\doctor-search.css ====================
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\components\doctor-search\doctor-search.html ====================
+
+ <div class="max-w-6xl mx-auto p-6">
+  <h2 class="text-2xl font-bold mb-6 text-gray-800">Search Available Doctors</h2>
+
+  <div class="bg-white p-4 rounded-lg shadow mb-6 flex flex-wrap gap-4 items-end">
+    <div class="flex-1 min-w-[200px]">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+      <select
+        [ngModel]="selectedDepartment()"
+        (ngModelChange)="selectedDepartment.set($event)"
+        class="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500">
+        <option [ngValue]="null">All Departments</option>
+        @for (dept of departments(); track dept.id) {
+          <option [ngValue]="dept.id">{{ dept.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="flex-1 min-w-[200px]">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Available Date</label>
+      <input
+        type="date"
+        [ngModel]="selectedDate()"
+        (ngModelChange)="selectedDate.set($event)"
+        class="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500" />
+    </div>
+
+    <div class="flex gap-2">
+      <button
+        (click)="searchDoctors()"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md font-medium transition cursor-pointer">
+        Search
+      </button>
+      <button
+        (click)="resetFilters()"
+        class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md font-medium transition cursor-pointer">
+        Reset Today
+      </button>
+    </div>
+  </div>
+
+
+  @if (isLoading()) {
+    <div class="text-center py-10 text-gray-500">
+      <p>Loading available doctors...</p>
+    </div>
+  } @else {
+    @if (doctors().length > 0) {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (doctor of doctors(); track doctor.id) {
+          <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 hover:shadow-md transition">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-bold text-gray-900">Dr. {{ doctor.firstName }} {{ doctor.lastName }}</h3>
+              <span class="bg-blue-100 text-blue-800 text-xs px-2.5 py-0.5 rounded-full font-semibold">
+                {{ doctor.departmentName }}
+              </span>
+            </div>
+            <p class="text-sm text-gray-600 mb-4">{{ doctor.specialization }}</p>
+
+            <div class="border-t pt-3">
+              <p class="text-xs font-semibold text-gray-500 mb-2">Available Slots:</p>
+              <div class="flex flex-wrap gap-2">
+                @for (slot of doctor.availableSlots; track slot.id) {
+                  <span class="bg-green-50 text-green-700 border border-green-200 text-xs px-2 py-1 rounded">
+                    {{ slot.startTime.substring(0,5) }} - {{ slot.endTime.substring(0,5) }}
+                  </span>
+                }
+              </div>
+              <!-- view details button -->
+            </div>
+                <button
+            (click)="viewDoctorDetails(doctor.id)"
+            class="w-full mt-5 bg-blue-600 hover:bg-blue-700
+                   text-white px-4 py-2 rounded-md
+                   font-medium transition">
+
+            View Details
+
+          </button>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="bg-white rounded-lg border border-dashed border-gray-300 p-12 text-center">
+        <p class="text-gray-500 font-medium">No available doctors found for the selected criteria.</p>
+      </div>
+    }
+  }
+  
+</div>
+
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\components\doctor-search\doctor-search.spec.ts ====================
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { DoctorSearch } from './doctor-search';
+import { DoctorService } from '../../services/doctor';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { of } from 'rxjs';
+import { vi, Mocked } from 'vitest';
+
+describe('DoctorSearch', () => {
+  let component: DoctorSearch;
+  let fixture: ComponentFixture<DoctorSearch>;
+  let doctorServiceSpy: Mocked<DoctorService>;
+
+  beforeEach(async () => {
+    const spy = {
+      getAvailableDoctors: vi.fn().mockReturnValue(of([]))
+    };
+
+    await TestBed.configureTestingModule({
+      imports: [DoctorSearch],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: DoctorService, useValue: spy }
+      ]
+    }).compileComponents();
+
+    doctorServiceSpy = TestBed.inject(DoctorService) as Mocked<DoctorService>;
+
+    fixture = TestBed.createComponent(DoctorSearch);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\components\doctor-search\doctor-search.ts ====================
+
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { DoctorService } from '../../services/doctor';
+import { DoctorResponse, DepartmentOption } from '../../models/doctor';
+import { Router} from "@angular/router";
+
+@Component({
+  selector: 'app-doctor-search',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './doctor-search.html',
+  styleUrls: ['./doctor-search.css']
+})
+export class DoctorSearch implements OnInit {
+  private doctorService = inject(DoctorService);
+  private router = inject(Router);
+
+  selectedDepartment = signal<number | null>(null);
+  selectedDate = signal<string>('');
+
+  doctors = signal<DoctorResponse[]>([]);
+  isLoading = signal<boolean>(false);
+
+  departments = signal<DepartmentOption[]>([
+    { id: 1, name: 'Cardiology' },
+    { id: 2, name: 'Pediatrics' },
+    { id: 3, name: 'Neurology' }
+  ]);
+
+  ngOnInit(): void {
+    const today = new Date().toISOString().split('T')[0];
+    this.selectedDate.set(today);
+    this.searchDoctors();
+  }
+
+  searchDoctors(): void {
+    this.isLoading.set(true);
+
+    const dept = this.selectedDepartment();
+    const date = this.selectedDate();
+
+    this.doctorService.getAvailableDoctors(dept, date).subscribe({
+      next: (data) => {
+        this.doctors.set(data);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error fetching available doctors:', err);
+        this.doctors.set([]);
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  resetFilters(): void {
+    const today = new Date().toISOString().split('T')[0];
+    this.selectedDepartment.set(null);
+    this.selectedDate.set(today);
+    this.searchDoctors();
+  }
+  viewDoctorDetails(doctorId: number): void {
+  this.router.navigate(['/doctors', doctorId]);
+}
+}
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\components\patient-appointments\patient-appointments.css ====================
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\components\patient-appointments\patient-appointments.html ====================
+
+<div class="max-w-4xl mx-auto p-6">
+  <h2 class="text-2xl font-bold mb-6 text-gray-800">My Appointments</h2>
+
+  <div class="flex gap-2 mb-6">
+    <button
+      (click)="activeTab.set('upcoming')"
+      [class]="activeTab() === 'upcoming'
+        ? 'bg-blue-600 text-white px-4 py-2 rounded-md font-medium'
+        : 'bg-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium'">
+      Upcoming
+    </button>
+    <button
+      (click)="activeTab.set('past')"
+      [class]="activeTab() === 'past'
+        ? 'bg-blue-600 text-white px-4 py-2 rounded-md font-medium'
+        : 'bg-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium'">
+      Past
+    </button>
+  </div>
+
+  @if (isLoading()) {
+  <div class="text-center py-10 text-gray-500">
+    <p>Loading appointments...</p>
+  </div>
+  } @else {
+  @if (activeTab() === 'upcoming') {
+  @if (upcoming().length > 0) {
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    @for (appt of upcoming(); track appt.appointmentId) {
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-lg font-bold text-gray-900">Dr. {{ appt.doctorName }}</h3>
+        <span [class]="statusClasses(appt.status)">{{ appt.status }}</span>
+      </div>
+      <p class="text-sm text-gray-600 mb-1">{{ appt.specialization }} Â· {{ appt.departmentName }}</p>
+      <p class="text-sm text-gray-500">{{ appt.date }} Â· {{ appt.startTime }} â€“ {{ appt.endTime }}</p>
+      @if (appt.notes) {
+      <p class="text-xs italic text-gray-400 mt-2">{{ appt.notes }}</p>
+      }
+    </div>
+    }
+  </div>
+  } @else {
+  <div class="bg-white rounded-lg border border-dashed border-gray-300 p-12 text-center">
+    <p class="text-gray-500 font-medium">No upcoming appointments.</p>
+  </div>
+  }
+  } @else {
+  @if (past().length > 0) {
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    @for (appt of past(); track appt.appointmentId) {
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-lg font-bold text-gray-900">Dr. {{ appt.doctorName }}</h3>
+        <span [class]="statusClasses(appt.status)">{{ appt.status }}</span>
+      </div>
+      <p class="text-sm text-gray-600 mb-1">{{ appt.specialization }} Â· {{ appt.departmentName }}</p>
+      <p class="text-sm text-gray-500">{{ appt.date }} Â· {{ appt.startTime }} â€“ {{ appt.endTime }}</p>
+    </div>
+    }
+  </div>
+  } @else {
+  <div class="bg-white rounded-lg border border-dashed border-gray-300 p-12 text-center">
+    <p class="text-gray-500 font-medium">No past appointments.</p>
+  </div>
+  }
+  }
+  }
+
+  @if (error()) {
+  <div class="bg-red-50 text-red-700 border border-red-200 rounded-md p-4 mt-4">
+    {{ error() }}
+  </div>
+  }
+</div>
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\components\patient-appointments\patient-appointments.spec.ts ====================
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { PatientAppointments } from './patient-appointments';
+
+describe('PatientAppointments', () => {
+  let component: PatientAppointments;
+  let fixture: ComponentFixture<PatientAppointments>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [PatientAppointments],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(PatientAppointments);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\components\patient-appointments\patient-appointments.ts ====================
+
+import { Component, inject, input, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { PatientAppointment } from '../../models/patient-appointment';
+import {PatientAppointmentService} from '../../services/PatientAppointmentService';
+
+@Component({
+  selector: 'app-patient-appointments',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './patient-appointments.html',
+  styleUrl: './patient-appointments.css'
+})
+export class PatientAppointments {
+  private appointmentService = inject(PatientAppointmentService);
+
+  patientId = input.required<number>();
+
+  upcoming = signal<PatientAppointment[]>([]);
+  past = signal<PatientAppointment[]>([]);
+  isLoading = signal(true);
+  error = signal('');
+  activeTab = signal<'upcoming' | 'past'>('upcoming');
+
+  ngOnInit(): void {
+    this.appointmentService.getUpcoming(this.patientId()).subscribe({
+      next: (data) => this.upcoming.set(data),
+      error: () => this.error.set('Could not load upcoming appointments')
+    });
+
+    this.appointmentService.getPast(this.patientId()).subscribe({
+      next: (data: PatientAppointment[]) => {
+        this.past.set(data);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.error.set('Could not load past appointments');
+        this.isLoading.set(false);
+      },
+    });
+  }
+
+  statusClasses(status: string): string {
+    const base = 'text-xs px-2.5 py-0.5 rounded-full font-semibold';
+    switch (status) {
+      case 'PENDING': return `${base} bg-yellow-100 text-yellow-800`;
+      case 'CONFIRMED': return `${base} bg-blue-100 text-blue-800`;
+      case 'COMPLETED': return `${base} bg-green-100 text-green-800`;
+      case 'CANCELLED': return `${base} bg-red-100 text-red-800`;
+      case 'NO_SHOW': return `${base} bg-gray-100 text-gray-800`;
+      default: return base;
+    }
+  }
+}
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\components\pending-referrals\pending-referrals.css ====================
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\components\pending-referrals\pending-referrals.html ====================
+
+<div class="p-6 bg-slate-50 min-h-screen">
+  <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-md p-6">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-slate-800">Pending Referrals</h2>
+      <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-3 py-1 rounded-full">
+        {{ referrals().length }} Pending
+      </span>
+    </div>
+
+    @if (isLoading()) {
+      <div class="flex justify-center items-center py-12">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    @if (!isLoading() && referrals().length > 0) {
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-slate-200 text-slate-500 text-sm">
+              <th class="py-3 px-4 font-semibold">Referral ID</th>
+              <th class="py-3 px-4 font-semibold">Patient Name</th>
+              <th class="py-3 px-4 font-semibold">Date Received</th>
+              <th class="py-3 px-4 font-semibold">Notes</th>
+              <th class="py-3 px-4 font-semibold">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-sm">
+            @for (item of referrals(); track item.id) {
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="py-3 px-4 font-medium text-slate-900">#{{ item.id }}</td>
+                <td class="py-3 px-4 text-slate-700">{{ item.patientName }}</td>
+                <td class="py-3 px-4 text-slate-500">{{ item.createdAt | date:'mediumDate' }}</td>
+                <td class="py-3 px-4 text-slate-600 italic max-w-xs truncate">{{ item.notes || 'No notes' }}</td>
+                <td class="py-3 px-4">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                    {{ item.status }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    @if (!isLoading() && referrals().length === 0) {
+      <div class="text-center py-12 text-slate-500">
+        <p class="text-lg">No pending referrals found.</p>
+      </div>
+    }
+
+  </div>
+</div>
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\components\pending-referrals\pending-referrals.spec.ts ====================
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { PendingReferrals } from './pending-referrals';
+
+describe('PendingReferrals', () => {
+  let component: PendingReferrals;
+  let fixture: ComponentFixture<PendingReferrals>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [PendingReferrals],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(PendingReferrals);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\components\pending-referrals\pending-referrals.ts ====================
+
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { DoctorService } from '../../services/doctor';
+import { PendingReferralResponse } from '../../models/pending-referral-reponse';
+import { CommonModule, DatePipe } from '@angular/common';
+
+@Component({
+  selector: 'app-pending-referrals',
+  imports: [CommonModule, DatePipe],
+  templateUrl: './pending-referrals.html',
+  styleUrl: './pending-referrals.css',
+})
+export class PendingReferrals implements OnInit {
+
+  private doctorService = inject(DoctorService);
+
+  referrals = signal<PendingReferralResponse[]>([]);
+  isLoading = signal<boolean>(true);
+  errorMessage = signal<string | null>(null);
+
+  ngOnInit(): void {
+    this.loadPendingReferrals();
+  }
+
+  loadPendingReferrals(doctorId: number = 1): void {
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    this.doctorService.getPendingReferrals(doctorId).subscribe({
+      next: (data) => {
+        this.referrals.set(data);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error fetching referrals:', err);
+        this.errorMessage.set('Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØªØ­ÙˆÙŠÙ„Ø§Øª Ø§Ù„Ù…Ø¹Ù„Ù‚Ø©.');
+        this.isLoading.set(false);
+      }
+    });
+  }
+}
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\models\doctor.ts ====================
+
+export interface SlotResponse {
+  id: number;
+  date: string;
+  startTime: string;
+  endTime: string;
+}
+
+export interface DoctorResponse {
+  id: number;
+  firstName: string;
+  lastName: string;
+  specialization: string;
+  departmentId: number;
+  departmentName: string;
+  availableSlots: SlotResponse[];
+}
+
+export interface DepartmentOption {
+  id: number;
+  name: string;
+}
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\models\patient-appointment.ts ====================
+
+export interface PatientAppointment {
+  appointmentId: number;
+  doctorName: string;
+  specialization: string;
+  departmentName: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
+  notes: string | null;
+}
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\models\pending-referral-reponse.ts ====================
+
+export interface PendingReferralResponse {
+  id: number;
+  patientId: number;
+  patientName: string;
+  notes: string;
+  status: string;
+  createdAt: string;
+}
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\services\appointment.spec.ts ====================
+
+import { TestBed } from '@angular/core/testing';
+
+import { PatientAppointmentService } from './PatientAppointmentService';
+
+describe('PatientAppointmentService', () => {
+  let service: PatientAppointmentService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(PatientAppointmentService);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\services\doctor.spec.ts ====================
+
+import { TestBed } from '@angular/core/testing';
+
+import { DoctorService } from './doctor';
+
+describe('Doctor', () => {
+  let service: DoctorService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(DoctorService);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\services\doctor.ts ====================
+
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { DoctorResponse } from '../models/doctor';
+import { PendingReferralResponse } from '../models/pending-referral-reponse';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DoctorService {
+  private http = inject(HttpClient);
+  private apiUrl = 'http://localhost:8080/api/doctors';
+
+  getAvailableDoctors(departmentId?: number | null, date?: string | null): Observable<DoctorResponse[]> {
+    let params = new HttpParams();
+
+    if (departmentId) {
+      params = params.set('department', departmentId.toString());
+    }
+
+    if (date) {
+      params = params.set('date', date);
+    }
+
+    return this.http.get<DoctorResponse[]>(this.apiUrl, { params });
+  }
+
+    getDoctorById(id: number): Observable<DoctorResponse> {
+    return this.http.get<DoctorResponse>(`${this.apiUrl}/${id}`);
+  }
+
+  getPendingReferrals(doctorId: number = 1): Observable<PendingReferralResponse[]> {
+    const params = new HttpParams().set('doctorId', doctorId.toString());
+    return this.http.get<PendingReferralResponse[]>(`${this.apiUrl}/referrals/pending`, { params });
+  }
+}
+
+
+==================== D:\Spring Boot projects\meditrack-frontend\src\app\services\PatientAppointmentService.ts ====================
+
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import {PatientAppointment} from '../models/patient-appointment';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class PatientAppointmentService {
+  private http = inject(HttpClient);
+  private baseUrl = 'http://localhost:8080/api/patients';
+
+  getUpcoming(patientId: number): Observable<PatientAppointment[]> {
+    return this.http.get<PatientAppointment[]>(`${this.baseUrl}/${patientId}/appointments/date`);
+  }
+
+  getPast(patientId: number): Observable<PatientAppointment[]> {
+    return this.http.get<PatientAppointment[]>(`${this.baseUrl}/${patientId}/appointments/past`);
+  }
+}
+

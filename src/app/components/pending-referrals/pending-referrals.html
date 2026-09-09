@@ -1,0 +1,62 @@
+<div class="p-6 bg-slate-50 min-h-screen">
+  <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-md p-6">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-slate-800">Pending Referrals</h2>
+      <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-3 py-1 rounded-full">
+        {{ referrals().length }} Pending
+      </span>
+    </div>
+
+    @if (isLoading()) {
+      <div class="flex justify-center items-center py-12">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    @if (!isLoading() && referrals().length > 0) {
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-slate-200 text-slate-500 text-sm">
+              <th class="py-3 px-4 font-semibold">Referral ID</th>
+              <th class="py-3 px-4 font-semibold">Patient Name</th>
+              <th class="py-3 px-4 font-semibold">Date Received</th>
+              <th class="py-3 px-4 font-semibold">Notes</th>
+              <th class="py-3 px-4 font-semibold">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-sm">
+            @for (item of referrals(); track item.id) {
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="py-3 px-4 font-medium text-slate-900">#{{ item.id }}</td>
+                <td class="py-3 px-4 text-slate-700">{{ item.patientName }}</td>
+                <td class="py-3 px-4 text-slate-500">{{ item.createdAt | date:'mediumDate' }}</td>
+                <td class="py-3 px-4 text-slate-600 italic max-w-xs truncate">{{ item.notes || 'No notes' }}</td>
+                <td class="py-3 px-4">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                    {{ item.status }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    @if (!isLoading() && referrals().length === 0) {
+      <div class="text-center py-12 text-slate-500">
+        <p class="text-lg">No pending referrals found.</p>
+      </div>
+    }
+
+  </div>
+</div>

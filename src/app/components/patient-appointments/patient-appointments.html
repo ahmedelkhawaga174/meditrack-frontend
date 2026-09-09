@@ -1,0 +1,265 @@
+<div class="max-w-4xl mx-auto p-6">
+  <h2 class="text-2xl font-bold mb-6 text-gray-800">My Appointments</h2>
+
+  <div class="flex gap-2 mb-6">
+    <button
+      (click)="activeTab.set('upcoming')"
+      [class]="activeTab() === 'upcoming'
+        ? 'bg-blue-600 text-white px-4 py-2 rounded-md font-medium'
+        : 'bg-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium'">
+      Upcoming
+    </button>
+
+    <button
+      (click)="activeTab.set('past')"
+      [class]="activeTab() === 'past'
+        ? 'bg-blue-600 text-white px-4 py-2 rounded-md font-medium'
+        : 'bg-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium'">
+      Past
+    </button>
+  </div>
+
+  @if (isLoading()) {
+
+    <div class="text-center py-10 text-gray-500">
+      <p>Loading appointments...</p>
+    </div>
+
+  } @else {
+
+    @if (activeTab() === 'upcoming') {
+
+      @if (upcoming().length > 0) {
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          @for (appt of upcoming(); track appt.appointmentId) {
+
+            <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+
+              <div class="flex items-center justify-between mb-2">
+
+                <h3 class="text-lg font-bold text-gray-900">
+                  Dr. {{ appt.doctorName }}
+                </h3>
+
+                <span [class]="statusClasses(appt.status)">
+                  {{ appt.status }}
+                </span>
+
+              </div>
+
+              <p class="text-sm text-gray-600 mb-1">
+                {{ appt.specialization }} · {{ appt.departmentName }}
+              </p>
+
+              <p class="text-sm text-gray-500">
+                {{ appt.date }} · {{ appt.startTime }} – {{ appt.endTime }}
+              </p>
+
+              @if (appt.notes) {
+
+                <p class="text-xs italic text-gray-400 mt-2">
+                  {{ appt.notes }}
+                </p>
+
+              }
+
+              <!-- Appointment actions -->
+              @if (appt.status === 'PENDING' || appt.status === 'CONFIRMED') {
+
+                <div class="mt-4 flex gap-2">
+
+                  <!-- Reschedule -->
+                  <button
+                    type="button"
+                    (click)="startReschedule(appt.appointmentId)"
+                    class="flex-1 bg-blue-600 hover:bg-blue-700
+                           text-white px-4 py-2 rounded-md
+                           font-medium">
+                    Reschedule
+                  </button>
+
+                  <!-- Cancel -->
+                  <button
+                    type="button"
+                    (click)="cancelAppointment(appt.appointmentId)"
+                    [disabled]="isCancelling() === appt.appointmentId"
+                    class="flex-1 bg-red-600 hover:bg-red-700
+                           disabled:bg-gray-400
+                           text-white px-4 py-2 rounded-md
+                           font-medium">
+
+                    @if (isCancelling() === appt.appointmentId) {
+                      Cancelling...
+                    } @else {
+                      Cancel Appointment
+                    }
+
+                  </button>
+
+                </div>
+
+              }
+
+              <!-- Reschedule section -->
+              @if (isRescheduling() === appt.appointmentId) {
+
+                <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+
+                  <h4 class="font-semibold text-blue-900 mb-3">
+                    Select a new slot
+                  </h4>
+
+                  @if (isLoadingSlots()) {
+
+                    <p class="text-blue-700">
+                      Loading available slots...
+                    </p>
+
+                  } @else if (availableSlots().length > 0) {
+
+                    <div class="flex flex-wrap gap-2">
+
+                      @for (slot of availableSlots(); track slot.id) {
+
+                        <button
+                          type="button"
+                          (click)="selectNewSlot(slot.id)"
+                          [class]="selectedNewSlotId() === slot.id
+                            ? 'bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium'
+                            : 'bg-white text-blue-700 border border-blue-300 px-3 py-2 rounded-md text-sm font-medium'"
+                        >
+                          {{ slot.date }}
+                          ·
+                          {{ slot.startTime.substring(0, 5) }}
+                          -
+                          {{ slot.endTime.substring(0, 5) }}
+                        </button>
+
+                      }
+
+                    </div>
+
+                    <div class="flex gap-2 mt-4">
+
+                      <button
+                        type="button"
+                        (click)="confirmReschedule(appt.appointmentId)"
+                        [disabled]="!selectedNewSlotId() || isLoadingSlots()"
+                        class="bg-green-600 hover:bg-green-700
+                               disabled:bg-gray-400
+                               text-white px-4 py-2 rounded-md
+                               font-medium">
+                        Confirm Reschedule
+                      </button>
+
+                      <button
+                        type="button"
+                        (click)="cancelReschedule()"
+                        class="bg-gray-200 hover:bg-gray-300
+                               text-gray-700 px-4 py-2 rounded-md
+                               font-medium">
+                        Cancel
+                      </button>
+
+                    </div>
+
+                  } @else {
+
+                    <p class="text-gray-600">
+                      No available slots found for this doctor.
+                    </p>
+
+                  }
+
+                </div>
+
+              }
+
+            </div>
+
+          }
+
+        </div>
+
+      } @else {
+
+        <div class="bg-white rounded-lg border border-dashed border-gray-300 p-12 text-center">
+          <p class="text-gray-500 font-medium">
+            No upcoming appointments.
+          </p>
+        </div>
+
+      }
+
+    } @else {
+
+      <!-- Past Appointments -->
+      @if (past().length > 0) {
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          @for (appt of past(); track appt.appointmentId) {
+
+            <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+
+              <div class="flex items-center justify-between mb-2">
+
+                <h3 class="text-lg font-bold text-gray-900">
+                  Dr. {{ appt.doctorName }}
+                </h3>
+
+                <span [class]="statusClasses(appt.status)">
+                  {{ appt.status }}
+                </span>
+
+              </div>
+
+              <p class="text-sm text-gray-600 mb-1">
+                {{ appt.specialization }} · {{ appt.departmentName }}
+              </p>
+
+              <p class="text-sm text-gray-500">
+                {{ appt.date }} · {{ appt.startTime }} – {{ appt.endTime }}
+              </p>
+
+            </div>
+
+          }
+
+        </div>
+
+      } @else {
+
+        <div class="bg-white rounded-lg border border-dashed border-gray-300 p-12 text-center">
+          <p class="text-gray-500 font-medium">
+            No past appointments.
+          </p>
+        </div>
+
+      }
+
+    }
+
+  }
+
+  <!-- Success message -->
+  @if (successMessage()) {
+
+    <div class="bg-green-50 text-green-700 border border-green-200 rounded-md p-4 mt-4">
+      {{ successMessage() }}
+    </div>
+
+  }
+
+  <!-- Error message -->
+  @if (error()) {
+
+    <div class="bg-red-50 text-red-700 border border-red-200 rounded-md p-4 mt-4">
+      {{ error() }}
+    </div>
+
+  }
+
+</div>
