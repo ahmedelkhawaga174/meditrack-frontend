@@ -7,7 +7,6 @@
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
 
-      <!-- Phone -->
       <div class="mb-5 flex flex-col">
         <label class="mb-2 font-semibold text-gray-600">
           Phone
@@ -30,7 +29,6 @@
         }
       </div>
 
-      <!-- Password -->
       <div class="mb-5 flex flex-col">
         <label class="mb-2 font-semibold text-gray-600">
           Password
@@ -53,7 +51,6 @@
         }
       </div>
 
-      <!-- Server Error -->
       @if (errorMessage) {
         <div
           class="mb-4 rounded bg-red-50 p-2 text-center text-sm text-red-600"
@@ -62,7 +59,6 @@
         </div>
       }
 
-      <!-- Submit -->
       <button
         type="submit"
         [disabled]="loginForm.invalid || isLoading"

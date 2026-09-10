@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -22,6 +22,7 @@ export class ReceptionistDashboard implements OnInit {
 
   private appointmentService = inject(AppointmentService);
   private waitingQueueService = inject(WaitingQueueService);
+  private cdr = inject(ChangeDetectorRef);
 
   appointments: Appointment[] = [];
   queue: WaitingQueue[] = [];
@@ -40,9 +41,11 @@ export class ReceptionistDashboard implements OnInit {
     this.appointmentService.getAppointments().subscribe({
       next: (appointments) => {
         this.appointments = appointments;
+        this.cdr.markForCheck();
       },
       error: () => {
         this.error = 'Failed to load appointments.';
+        this.cdr.markForCheck();
       }
     });
   }
@@ -51,9 +54,11 @@ export class ReceptionistDashboard implements OnInit {
     this.waitingQueueService.getQueue().subscribe({
       next: (queue) => {
         this.queue = queue;
+        this.cdr.markForCheck();
       },
       error: () => {
         this.error = 'Failed to load waiting queue.';
+        this.cdr.markForCheck();
       }
     });
   }
@@ -70,6 +75,8 @@ export class ReceptionistDashboard implements OnInit {
           `Appointment #${appointment.id} checked in successfully.`;
 
         this.loading = false;
+        this.loadAppointments();
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.error =
@@ -77,6 +84,7 @@ export class ReceptionistDashboard implements OnInit {
           'Unable to check in the patient.';
 
         this.loading = false;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -88,20 +96,22 @@ export class ReceptionistDashboard implements OnInit {
 
     if (!id) {
       this.error = 'Please enter a valid appointment ID.';
+      this.cdr.markForCheck();
       return;
     }
 
     this.loading = true;
 
     this.waitingQueueService.addToQueue(id).subscribe({
-      next: (queueEntry) => {
-        this.queue.push(queueEntry);
+      next: () => {
         this.appointmentId = '';
 
         this.message =
           `Appointment #${id} added to the waiting queue.`;
 
         this.loading = false;
+        this.loadQueue();
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.error =
@@ -109,6 +119,7 @@ export class ReceptionistDashboard implements OnInit {
           'Unable to add appointment to the queue.';
 
         this.loading = false;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -124,12 +135,13 @@ export class ReceptionistDashboard implements OnInit {
       .updateStatus(queueEntry.id, status)
       .subscribe({
         next: (updatedEntry) => {
-          queueEntry.status = updatedEntry.status;
 
           this.message =
             `Queue #${queueEntry.id} updated to ${updatedEntry.status}.`;
 
           this.loading = false;
+          this.loadQueue();
+          this.cdr.markForCheck();
         },
         error: (err) => {
           this.error =
@@ -137,6 +149,7 @@ export class ReceptionistDashboard implements OnInit {
             'Unable to update queue status.';
 
           this.loading = false;
+          this.cdr.markForCheck();
         }
       });
   }
