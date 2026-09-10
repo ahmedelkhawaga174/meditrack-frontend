@@ -6,7 +6,7 @@ import { ViewUpcomingAppointmentResponse } from '../models/view-upcoming';
 @Injectable({
   providedIn: 'root',
 })
-export class UpcomingAppointmentService {
+export class UpcomingAppointmentsService {
 
   private http = inject(HttpClient);
   private apiUrl = 'http://localhost:8080/api/doctors';

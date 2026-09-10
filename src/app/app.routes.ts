@@ -7,6 +7,7 @@ import { ReceptionistDashboard } from './components/receptionist-dashboard/recep
 import { PatientMedicalHistory } from './components/patient-medical-history/patient-medical-history';
 import { Consultation } from './components/consultation/consultation';
 import { Login } from './components/login/login';
+import { UpcomingAppointments } from './components/upcoming-appointments/upcoming-appointments';
 export const routes: Routes = [
   {
     path: 'login',
@@ -37,7 +38,10 @@ export const routes: Routes = [
     path: 'receptionist',
     component: ReceptionistDashboard,
   },
-
+  {
+    path: 'doctors/:doctorId/appointments/upcoming',
+    component: UpcomingAppointments
+  },
   {
     path: '**',
     component: DoctorSearch,
