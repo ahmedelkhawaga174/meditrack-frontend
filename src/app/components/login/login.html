@@ -1,0 +1,76 @@
+<div class="flex min-h-screen items-center justify-center bg-gray-100">
+  <div class="w-full max-w-md rounded-xl bg-white p-10 shadow-lg">
+
+    <h2 class="mb-6 text-center text-2xl font-bold text-gray-800">
+      Login
+    </h2>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+      <!-- Phone -->
+      <div class="mb-5 flex flex-col">
+        <label class="mb-2 font-semibold text-gray-600">
+          Phone
+        </label>
+
+        <input
+          type="text"
+          formControlName="username"
+          placeholder="Enter your phone number"
+          class="rounded-md border border-gray-300 p-3 text-base outline-none transition focus:border-indigo-600"
+        />
+
+        @if (
+          loginForm.get('username')?.touched &&
+          loginForm.get('username')?.invalid
+        ) {
+          <span class="mt-1 text-sm text-red-600">
+            Please enter a valid cell number
+          </span>
+        }
+      </div>
+
+      <!-- Password -->
+      <div class="mb-5 flex flex-col">
+        <label class="mb-2 font-semibold text-gray-600">
+          Password
+        </label>
+
+        <input
+          type="password"
+          formControlName="password"
+          placeholder="********"
+          class="rounded-md border border-gray-300 p-3 text-base outline-none transition focus:border-indigo-600"
+        />
+
+        @if (
+          loginForm.get('password')?.touched &&
+          loginForm.get('password')?.invalid
+        ) {
+          <span class="mt-1 text-sm text-red-600">
+            Password is required (minimum 6 characters)
+          </span>
+        }
+      </div>
+
+      <!-- Server Error -->
+      @if (errorMessage) {
+        <div
+          class="mb-4 rounded bg-red-50 p-2 text-center text-sm text-red-600"
+        >
+          {{ errorMessage }}
+        </div>
+      }
+
+      <!-- Submit -->
+      <button
+        type="submit"
+        [disabled]="loginForm.invalid || isLoading"
+        class="w-full rounded-md bg-indigo-600 p-3 text-base font-bold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
+      >
+        {{ isLoading ? 'Authenticating...' : 'Sign In' }}
+      </button>
+
+    </form>
+  </div>
+</div>

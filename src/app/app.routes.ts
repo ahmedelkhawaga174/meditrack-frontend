@@ -6,8 +6,12 @@ import { PatientAppointments } from './components/patient-appointments/patient-a
 import { ReceptionistDashboard } from './components/receptionist-dashboard/receptionist-dashboard';
 import { PatientMedicalHistory } from './components/patient-medical-history/patient-medical-history';
 import { Consultation } from './components/consultation/consultation';
-
+import { Login } from './components/login/login';
 export const routes: Routes = [
+  {
+    path: 'login',
+    component: Login,
+  },
   {
     path: 'doctors/referrals/pending',
     component: PendingReferrals,
