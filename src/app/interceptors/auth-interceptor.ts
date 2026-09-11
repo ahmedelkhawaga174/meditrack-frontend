@@ -8,16 +8,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  const isLoginRequest = req.url.includes('/login');
-
-  const token = authService.getToken();
-  const authReq =
-    token && !isLoginRequest
-      ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
-      : req;
+  // Send session cookie with every request
+  const authReq = req.clone({
+    withCredentials: true
+  });
 
   return next(authReq).pipe(
     catchError((error) => {
+
+      // Session expired / user is not authenticated
       if (error?.status === 401 && authService.isLoggedIn()) {
         authService.logout();
         router.navigate(['/login']);
