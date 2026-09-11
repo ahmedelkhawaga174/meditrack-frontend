@@ -8,6 +8,7 @@ import { PatientMedicalHistory } from './components/patient-medical-history/pati
 import { Consultation } from './components/consultation/consultation';
 import { Login } from './components/login/login';
 import { UpcomingAppointments } from './components/upcoming-appointments/upcoming-appointments';
+import { Diagnosis } from './components/diagnosis/diagnosis';
 export const routes: Routes = [
   {
     path: 'login',
@@ -41,6 +42,10 @@ export const routes: Routes = [
   {
     path: 'doctors/:doctorId/appointments/upcoming',
     component: UpcomingAppointments
+  },
+  {
+    path: 'appointments/:id/diagnosis',
+    component: Diagnosis,
   },
   {
     path: '**',
