@@ -10,12 +10,17 @@ export const USER_KEY = 'auth_user';
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly apiUrl = 'http://localhost:8080/login';
+
+  private readonly apiUrl = 'http://localhost:8080/api/auth/login';
 
   constructor(private http: HttpClient) {}
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(this.apiUrl, credentials).pipe(
+    return this.http.post<LoginResponse>(
+      this.apiUrl,
+      credentials,
+      { withCredentials: true }
+    ).pipe(
       tap((response) => this.saveSession(response))
     );
   }
@@ -26,6 +31,7 @@ export class AuthService {
 
   getUser(): LoginResponse | null {
     const raw = localStorage.getItem(USER_KEY);
+
     if (!raw) {
       return null;
     }
@@ -38,7 +44,7 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    return !!this.getUser();
   }
 
   logout(): void {
@@ -47,11 +53,10 @@ export class AuthService {
   }
 
   private saveSession(response: LoginResponse): void {
-    if (!response?.token) {
-      return;
-    }
-
-    localStorage.setItem(TOKEN_KEY, response.token);
     localStorage.setItem(USER_KEY, JSON.stringify(response));
+
+    if (response?.token) {
+      localStorage.setItem(TOKEN_KEY, response.token);
+    }
   }
 }
