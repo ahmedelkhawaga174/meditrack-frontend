@@ -12,6 +12,7 @@ import { Login } from './components/login/login';
 import { UpcomingAppointments } from './components/upcoming-appointments/upcoming-appointments';
 import { Diagnosis } from './components/diagnosis/diagnosis';
 import { Register } from './components/register/register';
+import { Note } from './components/note/note';
 
 export const routes: Routes = [
 
@@ -79,6 +80,10 @@ export const routes: Routes = [
   {
     path: 'appointments/:id/diagnosis',
     component: Diagnosis,
+  },
+  {
+    path: 'consultations/:id/notes',
+    component: Note,
   },
 
   {
