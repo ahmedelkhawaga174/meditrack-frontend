@@ -5,6 +5,13 @@ export interface ReferralRequest {
   notes?: string;
 }
 
+export interface DoctorOption {
+  id: number;
+  firstName: string;
+  lastName: string;
+  specialty?: string;
+}
+
 export interface ReferralResponse {
   appointmentId: number;
   patientId: number;
@@ -16,11 +23,4 @@ export interface ReferralResponse {
   referralDetails: string;
   status: string;
   createdAt: string;
-}
-
-export interface DoctorOption {
-  id: number;
-  firstName: string;
-  lastName: string;
-  specialty?: string;
 }

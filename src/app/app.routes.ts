@@ -13,6 +13,8 @@ import { UpcomingAppointments } from './components/upcoming-appointments/upcomin
 import { Diagnosis } from './components/diagnosis/diagnosis';
 import { Register } from './components/register/register';
 import { Note } from './components/note/note';
+import { Referral } from './components/referral/referral';
+import { DoctorPatientComponent } from './components/doctor-patient/doctor-patient';
 
 export const routes: Routes = [
 
@@ -84,6 +86,14 @@ export const routes: Routes = [
   {
     path: 'consultations/:id/notes',
     component: Note,
+  },
+  {
+    path: 'doctors/:doctorId/patients',
+    component: DoctorPatientComponent,
+  },
+  {
+    path: 'referrals/create/:appointmentId',
+    component: Referral,
   },
 
   {
