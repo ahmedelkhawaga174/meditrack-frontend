@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ReferralService } from './Referral';
+import { ReferralService } from './referral';
 
 describe('ReferralService', () => {
   let service: ReferralService;
