@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
-import { LoginRequest, LoginResponse } from '../models/auth';
+import {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  RegisterResponse
+} from '../models/auth';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 
@@ -11,17 +16,40 @@ export const USER_KEY = 'auth_user';
 })
 export class AuthService {
 
-  private readonly apiUrl = 'http://localhost:8080/api/auth/login';
+  private readonly apiUrl = 'http://localhost:8080/api/auth';
 
   constructor(private http: HttpClient) {}
 
+  // LOGIN
   login(credentials: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(
-      this.apiUrl,
+      `${this.apiUrl}/login`,
       credentials,
       { withCredentials: true }
     ).pipe(
       tap((response) => this.saveSession(response))
+    );
+  }
+
+  // REGISTER
+  register(request: RegisterRequest): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(
+      `${this.apiUrl}/register`,
+      request
+    );
+  }
+
+  // VERIFY OTP
+  verifyOtp(phone: string, otp: string): Observable<string> {
+    return this.http.post(
+      `${this.apiUrl}/verify-otp`,
+      {
+        phone,
+        otp
+      },
+      {
+        responseType: 'text'
+      }
     );
   }
 

@@ -1,0 +1,76 @@
+<div class="flex min-h-screen items-center justify-center bg-gray-100">
+
+  <div class="w-full max-w-md rounded-xl bg-white p-10 shadow-lg">
+
+    <h2 class="mb-2 text-center text-2xl font-bold text-gray-800">
+      Verify OTP
+    </h2>
+
+    <p class="mb-6 text-center text-sm text-gray-500">
+      Enter the 6-digit OTP sent to your phone
+    </p>
+
+    <form
+      [formGroup]="otpForm"
+      (ngSubmit)="onSubmit()"
+      class="space-y-5"
+    >
+
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-700">
+          OTP
+        </label>
+
+        <input
+          type="text"
+          maxlength="6"
+          formControlName="otp"
+          placeholder="Enter OTP"
+          class="w-full rounded-lg border border-gray-300 px-4 py-3 text-center text-lg tracking-widest outline-none focus:border-blue-500"
+        />
+
+        @if (
+          otpForm.get('otp')?.touched &&
+          otpForm.get('otp')?.invalid
+        ) {
+          <p class="mt-1 text-sm text-red-500">
+            Please enter a valid 6-digit OTP
+          </p>
+        }
+      </div>
+
+      @if (errorMessage) {
+        <p class="text-center text-sm text-red-500">
+          {{ errorMessage }}
+        </p>
+      }
+
+      @if (successMessage) {
+        <p class="text-center text-sm text-green-600">
+          {{ successMessage }}
+        </p>
+      }
+
+      <button
+        type="submit"
+        [disabled]="isLoading"
+        class="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {{ isLoading ? 'Verifying...' : 'Verify OTP' }}
+      </button>
+
+    </form>
+
+    <p class="mt-6 text-center text-sm text-gray-600">
+      Already verified?
+      <a
+        routerLink="/login"
+        class="font-semibold text-blue-600 hover:underline"
+      >
+        Login
+      </a>
+    </p>
+
+  </div>
+
+</div>
