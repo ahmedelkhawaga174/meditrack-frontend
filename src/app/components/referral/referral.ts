@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReferralService } from '../../services/referral';
 import { DoctorOption, ReferralRequest } from '../../models/referral';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-referral',
