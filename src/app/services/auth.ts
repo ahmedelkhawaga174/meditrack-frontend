@@ -8,7 +8,6 @@ import {
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 
-export const TOKEN_KEY = 'auth_token';
 export const USER_KEY = 'auth_user';
 
 @Injectable({
@@ -35,7 +34,8 @@ export class AuthService {
   register(request: RegisterRequest): Observable<RegisterResponse> {
     return this.http.post<RegisterResponse>(
       `${this.apiUrl}/register`,
-      request
+      request,
+      { withCredentials: true }
     );
   }
 
@@ -48,15 +48,13 @@ export class AuthService {
         otp
       },
       {
-        responseType: 'text'
+        responseType: 'text',
+        withCredentials: true
       }
     );
   }
 
-  getToken(): string | null {
-    return localStorage.getItem(TOKEN_KEY);
-  }
-
+  // GET LOGGED-IN USER
   getUser(): LoginResponse | null {
     const raw = localStorage.getItem(USER_KEY);
 
@@ -71,20 +69,21 @@ export class AuthService {
     }
   }
 
+  // CHECK LOGIN
   isLoggedIn(): boolean {
     return !!this.getUser();
   }
 
+  // LOGOUT
   logout(): void {
-    localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
   }
 
+  // SAVE USER DATA
   private saveSession(response: LoginResponse): void {
-    localStorage.setItem(USER_KEY, JSON.stringify(response));
-
-    if (response?.token) {
-      localStorage.setItem(TOKEN_KEY, response.token);
-    }
+    localStorage.setItem(
+      USER_KEY,
+      JSON.stringify(response)
+    );
   }
 }

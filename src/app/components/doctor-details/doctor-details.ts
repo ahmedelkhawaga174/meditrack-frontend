@@ -1,9 +1,11 @@
 import { Component, inject, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 import { DoctorResponse, SlotResponse } from '../../models/doctor';
 import { DoctorService } from '../../services/doctor';
 import { AppointmentService } from '../../services/appointment';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-doctor-details',
@@ -16,6 +18,8 @@ export class DoctorDetails {
 
   private doctorService = inject(DoctorService);
   private appointmentService = inject(AppointmentService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   doctorId = input.required<number>();
 
@@ -59,8 +63,17 @@ export class DoctorDetails {
   bookAppointment(): void {
     const doctor = this.doctor();
     const slot = this.selectedSlot();
+    const user = this.authService.getUser();
 
     if (!doctor || !slot) {
+      return;
+    }
+
+    // Make sure a patient is logged in
+    if (!user || !user.patientId) {
+      this.error.set(
+        'Patient information not found. Please login again.'
+      );
       return;
     }
 
@@ -69,11 +82,13 @@ export class DoctorDetails {
     this.bookingMessage.set('');
 
     this.appointmentService.bookAppointment({
-      patientId: 1,
+      patientId: user.patientId,
       doctorId: doctor.id,
       slotId: slot.id,
       notes: 'First consultation'
     }).subscribe({
+
+      // Booking successful
       next: (appointment) => {
         this.isBooking.set(false);
 
@@ -83,9 +98,15 @@ export class DoctorDetails {
 
         this.selectedSlot.set(null);
 
-        this.loadDoctor();
+        // Navigate automatically to My Appointments
+        this.router.navigate([
+          '/patients',
+          user.patientId,
+          'appointments'
+        ]);
       },
 
+      // Booking failed
       error: (err) => {
         console.error(err);
 

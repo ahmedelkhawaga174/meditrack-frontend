@@ -4,12 +4,14 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  token?: string;
-  type?: string;
-  id?: number;
-  username?: string;
-  email?: string;
+  userId: number;
+  patientId: number | null;
+  phone: string;
+  role: string;
+  lastLoginAt: string;
+  message: string;
 }
+
 export interface RegisterRequest {
   phone: string;
   password: string;
