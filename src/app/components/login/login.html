@@ -12,13 +12,12 @@
     Phone
   </label>
 
-  <input
-    type="text"
-    formControlName="phone"
-    placeholder="Enter your phone number"
-    class="rounded-md border border-gray-300 p-3 text-base outline-none transition focus:border-indigo-600"
-  />
-
+<input
+  type="text"
+  formControlName="phone"
+  placeholder="Enter your phone number"
+  class="rounded-md border border-gray-300 p-3 text-base outline-none transition focus:border-indigo-600"
+/>
   @if (
     loginForm.get('phone')?.touched &&
     loginForm.get('phone')?.invalid

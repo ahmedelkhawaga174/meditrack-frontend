@@ -1,0 +1,87 @@
+<div class="p-6 bg-slate-50 min-h-screen">
+  <div class="max-w-2xl mx-auto space-y-6">
+
+    <div class="border-b border-slate-200 pb-4 flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-900">Record Diagnosis</h1>
+        <p class="text-sm text-slate-500 mt-1">Add medical diagnosis for Appointment #{{ appointmentId() }}</p>
+      </div>
+      <a routerLink="/appointments" class="text-sm font-medium text-slate-600 hover:text-slate-900 flex items-center gap-1">
+        &larr; Back to Appointments
+      </a>
+    </div>
+
+    @if (successMessage()) {
+      <div class="p-4 text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg flex justify-between items-center">
+        <span>{{ successMessage() }}</span>
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="p-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    @if (!isCompleted()) {
+      <form [formGroup]="diagnosisForm" (ngSubmit)="onSubmit()" class="bg-white p-6 rounded-xl border border-slate-200 space-y-5 shadow-sm">
+
+        <div>
+          <label for="diagnosis" class="block text-sm font-semibold text-slate-700 mb-2">
+            Diagnosis *
+          </label>
+          <textarea
+            id="diagnosis"
+            rows="4"
+            formControlName="diagnosis"
+            placeholder="Enter medical diagnosis details..."
+            class="w-full p-3 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none"
+            [class.border-red-500]="diagnosisForm.get('diagnosis')?.invalid && diagnosisForm.get('diagnosis')?.touched"
+          ></textarea>
+          @if (diagnosisForm.get('diagnosis')?.invalid && diagnosisForm.get('diagnosis')?.touched) {
+            <p class="mt-1 text-xs text-red-600">Diagnosis is required (minimum 3 characters).</p>
+          }
+        </div>
+
+        <div class="flex justify-end items-center gap-3 pt-4 border-t border-slate-100">
+          <a
+            routerLink="/appointments"
+            class="px-5 py-2.5 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-all"
+          >
+            Cancel
+          </a>
+          <button
+            type="submit"
+            [disabled]="isSubmitting() || diagnosisForm.invalid"
+            class="px-6 py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+          >
+            @if (isSubmitting()) {
+              <span>Saving...</span>
+            } @else {
+              <span>Save Diagnosis</span>
+            }
+          </button>
+        </div>
+      </form>
+    } @else {
+      <div class="bg-white p-8 rounded-xl border border-slate-200 text-center space-y-4 shadow-sm">
+        <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
+          ✓
+        </div>
+        <h2 class="text-xl font-bold text-slate-900">Diagnosis Saved</h2>
+        <p class="text-sm text-slate-600 max-w-md mx-auto">
+          The diagnosis for appointment #{{ appointmentId() }} has been recorded successfully.
+        </p>
+        <div class="pt-4 flex justify-center gap-3">
+          <a
+            routerLink="/appointments"
+            class="px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-all"
+          >
+            Return to Appointments
+          </a>
+        </div>
+      </div>
+    }
+
+  </div>
+</div>
