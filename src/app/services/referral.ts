@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { DoctorOption, ReferralRequest, ReferralResponse } from '../models/referral';
 import { Observable } from 'rxjs';
@@ -20,5 +20,14 @@ export class ReferralService {
 
   getReferralById(id: number): Observable<ReferralResponse> {
     return this.http.get<ReferralResponse>(`${this.baseUrl}/referrals/${id}`);
+  }
+
+  getPendingReferrals(doctorId: number): Observable<ReferralResponse[]> {
+    const params = new HttpParams().set('doctorId', doctorId.toString());
+    return this.http.get<ReferralResponse[]>(`${this.baseUrl}/referrals/pending`, { params });
+  }
+
+  updateReferralStatus(id: number, status: 'ACCEPTED' | 'REJECTED'): Observable<ReferralResponse> {
+    return this.http.put<ReferralResponse>(`${this.baseUrl}/referrals/${id}/status`, { status });
   }
 }
