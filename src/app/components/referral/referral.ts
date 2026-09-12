@@ -1,12 +1,13 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ReferralService } from '../../services/referral';
 import { DoctorOption, ReferralRequest } from '../../models/referral';
 
 @Component({
   selector: 'app-referral',
-  imports: [ReactiveFormsModule],
+  standalone: true,
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './referral.html',
   styleUrl: './referral.css',
 })
@@ -32,8 +33,7 @@ export class Referral implements OnInit {
 
     this.referralForm = this.fb.group({
       referredToDoctorId: ['', [Validators.required]],
-      reason: ['', [Validators.required, Validators.minLength(5)]],
-      notes: [''],
+      referralReason: ['', [Validators.required, Validators.minLength(5)]],
     });
 
     this.loadDoctors();
@@ -58,17 +58,16 @@ export class Referral implements OnInit {
     const payload: ReferralRequest = {
       appointmentId: this.appointmentId()!,
       referredToDoctorId: Number(this.referralForm.value.referredToDoctorId),
-      reason: this.referralForm.value.reason,
-      notes: this.referralForm.value.notes,
+      referralReason: this.referralForm.value.referralReason,
     };
 
     this.referralService.createReferral(payload).subscribe({
-      next: () => {
+      next: (createdReferral) => {
         this.isSubmitting.set(false);
         this.successMessage.set('Referral submitted successfully!');
         setTimeout(() => {
-          this.router.navigate(['/doctors/1/patients']);
-        }, 1500);
+          this.router.navigate(['/referrals', createdReferral.id]);
+        }, 1200);
       },
       error: (err) => {
         this.isSubmitting.set(false);

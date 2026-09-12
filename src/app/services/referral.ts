@@ -7,7 +7,6 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class ReferralService {
-
   private http = inject(HttpClient);
   private baseUrl = 'http://localhost:8080/api';
 
@@ -17,5 +16,9 @@ export class ReferralService {
 
   getDoctors(): Observable<DoctorOption[]> {
     return this.http.get<DoctorOption[]>(`${this.baseUrl}/doctors`);
+  }
+
+  getReferralById(id: number): Observable<ReferralResponse> {
+    return this.http.get<ReferralResponse>(`${this.baseUrl}/referrals/${id}`);
   }
 }
