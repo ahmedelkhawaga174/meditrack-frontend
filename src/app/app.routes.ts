@@ -16,6 +16,7 @@ import { Note } from './components/note/note';
 import { Referral } from './components/referral/referral';
 import { DoctorPatientComponent } from './components/doctor-patient/doctor-patient';
 import { ReferralDetails } from './components/referral-details/referral-details';
+import { PendingReferral } from './components/pending-referral/pending-referral';
 
 export const routes: Routes = [
 
@@ -100,7 +101,10 @@ export const routes: Routes = [
     path: 'referrals/:id',
     component: ReferralDetails,
   },
-
+  {
+    path: 'doctors/:doctorId/referrals/pending',
+    component: PendingReferral,
+  },
   {
     path: '**',
     redirectTo: 'register'

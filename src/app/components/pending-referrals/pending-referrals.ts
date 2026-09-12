@@ -32,7 +32,7 @@ export class PendingReferrals implements OnInit {
       },
       error: (err) => {
         console.error('Error fetching referrals:', err);
-        this.errorMessage.set('حدث خطأ أثناء تحميل التحويلات المعلقة.');
+        this.errorMessage.set('An error occurred while loading pending transfers.');
         this.isLoading.set(false);
       }
     });
