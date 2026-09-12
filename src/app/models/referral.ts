@@ -1,8 +1,15 @@
+export interface DoctorPatient {
+  appointmentId: number;
+  patientId: number;
+  patientName: string;
+  appointmentDate: string;
+  appointmentStatus: string;
+}
+
 export interface ReferralRequest {
   appointmentId: number;
   referredToDoctorId: number;
-  reason: string;
-  notes?: string;
+  referralReason: string;
 }
 
 export interface DoctorOption {
@@ -13,14 +20,15 @@ export interface DoctorOption {
 }
 
 export interface ReferralResponse {
+  id: number;
   appointmentId: number;
   patientId: number;
   patientName: string;
-  currentDoctorId: number;
-  currentDoctorName: string;
+  referringDoctorId: number;
+  referringDoctorName: string;
   referredToDoctorId: number;
   referredToDoctorName: string;
-  referralDetails: string;
+  referralReason: string;
   status: string;
   createdAt: string;
 }

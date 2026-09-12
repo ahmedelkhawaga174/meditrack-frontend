@@ -15,6 +15,7 @@ import { Register } from './components/register/register';
 import { Note } from './components/note/note';
 import { Referral } from './components/referral/referral';
 import { DoctorPatientComponent } from './components/doctor-patient/doctor-patient';
+import { ReferralDetails } from './components/referral-details/referral-details';
 
 export const routes: Routes = [
 
@@ -94,6 +95,10 @@ export const routes: Routes = [
   {
     path: 'referrals/create/:appointmentId',
     component: Referral,
+  },
+  {
+    path: 'referrals/:id',
+    component: ReferralDetails,
   },
 
   {
