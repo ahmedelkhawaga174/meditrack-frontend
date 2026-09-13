@@ -1,5 +1,6 @@
 import { Component, inject, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 import { PatientAppointment } from '../../models/patient-appointment';
 import { PatientAppointmentService } from '../../services/PatientAppointmentService';
@@ -10,7 +11,7 @@ import { SlotResponse } from '../../models/doctor';
 @Component({
   selector: 'app-patient-appointments',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './patient-appointments.html',
   styleUrl: './patient-appointments.css'
 })

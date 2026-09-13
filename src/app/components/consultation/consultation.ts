@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ConsultationService } from '../../services/consultation';
 import { ConsultationResponse } from '../../models/consultation-response-request';
+import { PrescriptionRequest } from '../../models/prescription';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -19,21 +20,42 @@ export class Consultation implements OnInit {
   private consultationService = inject(ConsultationService);
 
   consultationForm!: FormGroup;
+  prescriptionForm!: FormGroup;
+
   appointmentId = signal<string>('');
 
   isSubmitting = signal<boolean>(false);
   isCompleted = signal<boolean>(false);
+
   savedConsultation = signal<ConsultationResponse | null>(null);
+  savedPrescription = signal<unknown | null>(null);
+  
+
+  isPrescriptionSubmitting = signal<boolean>(false);
 
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
 
+  prescriptionErrorMessage = signal<string | null>(null);
+  prescriptionSuccessMessage = signal<string | null>(null);
+
   ngOnInit(): void {
-    const apptId = this.route.snapshot.paramMap.get('id') || this.route.snapshot.queryParamMap.get('appointmentId') || '';
+    const apptId =
+      this.route.snapshot.paramMap.get('id') ||
+      this.route.snapshot.queryParamMap.get('appointmentId') ||
+      '';
+
     this.appointmentId.set(apptId);
 
     this.consultationForm = this.fb.group({
       notes: ['', [Validators.required, Validators.minLength(10)]]
+    });
+
+    this.prescriptionForm = this.fb.group({
+      medicationName: ['', Validators.required],
+      dosage: ['', Validators.required],
+      frequency: ['', Validators.required],
+      duration: ['', Validators.required]
     });
   }
 
@@ -56,12 +78,50 @@ export class Consultation implements OnInit {
         this.isSubmitting.set(false);
         this.isCompleted.set(true);
         this.savedConsultation.set(response);
-        this.successMessage.set('Consultation successfully recorded and appointment marked as COMPLETED.');
+        this.successMessage.set(
+          'Consultation successfully recorded and appointment marked as COMPLETED.'
+        );
       },
       error: (err) => {
         console.error('Error recording consultation:', err);
         this.isSubmitting.set(false);
-        this.errorMessage.set(err.error?.message || 'Failed to record consultation. Please try again.');
+        this.errorMessage.set(
+          err.error?.message || 'Failed to record consultation. Please try again.'
+        );
+      }
+    });
+  }
+
+  onSubmitPrescription(): void {
+    if (this.prescriptionForm.invalid || !this.appointmentId()) {
+      this.prescriptionForm.markAllAsTouched();
+      return;
+    }
+
+    this.isPrescriptionSubmitting.set(true);
+    this.prescriptionErrorMessage.set(null);
+    this.prescriptionSuccessMessage.set(null);
+
+    const request: PrescriptionRequest = this.prescriptionForm.value;
+
+    this.consultationService.issuePrescription(
+      Number(this.appointmentId()),
+      request
+    ).subscribe({
+      next: (response) => {
+        this.isPrescriptionSubmitting.set(false);
+        this.savedPrescription.set(response);
+        this.prescriptionSuccessMessage.set(
+          'Prescription issued successfully.'
+        );
+        this.prescriptionForm.reset();
+      },
+      error: (err) => {
+        console.error('Error issuing prescription:', err);
+        this.isPrescriptionSubmitting.set(false);
+        this.prescriptionErrorMessage.set(
+          err.error?.message || 'Failed to issue prescription. Please try again.'
+        );
       }
     });
   }
