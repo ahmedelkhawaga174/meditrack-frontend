@@ -17,7 +17,7 @@ import { Referral } from './components/referral/referral';
 import { DoctorPatientComponent } from './components/doctor-patient/doctor-patient';
 import { ReferralDetails } from './components/referral-details/referral-details';
 import { PendingReferral } from './components/pending-referral/pending-referral';
-
+import { PatientPrescriptions } from './components/patient-prescriptions/patient-prescriptions';
 export const routes: Routes = [
 
   {
@@ -28,27 +28,27 @@ export const routes: Routes = [
 
   {
     path: 'login',
-    component: Login,
+    component: Login
   },
 
   {
     path: 'register',
-    component: Register,
+    component: Register
   },
 
   {
     path: 'verify-otp',
-    component: VerifyOtp,
+    component: VerifyOtp
   },
 
   {
     path: 'doctors',
-    component: DoctorSearch,
+    component: DoctorSearch
   },
 
   {
     path: 'doctors/referrals/pending',
-    component: PendingReferrals,
+    component: PendingReferrals
   },
 
   {
@@ -57,23 +57,28 @@ export const routes: Routes = [
   },
 
   {
+    path: 'patients/:patientId/prescriptions',
+    component: PatientPrescriptions
+  },
+
+  {
     path: 'consultations/:id',
-    component: Consultation,
+    component: Consultation
   },
 
   {
     path: 'doctors/:doctorId',
-    component: DoctorDetails,
+    component: DoctorDetails
   },
 
   {
     path: 'patients/:patientId/appointments',
-    component: PatientAppointments,
+    component: PatientAppointments
   },
 
   {
     path: 'receptionist',
-    component: ReceptionistDashboard,
+    component: ReceptionistDashboard
   },
 
   {
@@ -83,19 +88,22 @@ export const routes: Routes = [
 
   {
     path: 'appointments/:id/diagnosis',
-    component: Diagnosis,
+    component: Diagnosis
   },
+
   {
     path: 'consultations/:id/notes',
-    component: Note,
+    component: Note
   },
+
   {
     path: 'doctors/:doctorId/patients',
-    component: DoctorPatientComponent,
+    component: DoctorPatientComponent
   },
+
   {
     path: 'referrals/create/:appointmentId',
-    component: Referral,
+    component: Referral
   },
   {
     path: 'referrals/:id',
@@ -108,6 +116,6 @@ export const routes: Routes = [
   {
     path: '**',
     redirectTo: 'register'
-  },
+  }
 
 ];
