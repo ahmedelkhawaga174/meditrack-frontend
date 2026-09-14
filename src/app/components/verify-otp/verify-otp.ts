@@ -11,17 +11,27 @@ import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-verify-otp',
-  imports: [ReactiveFormsModule, CommonModule, RouterLink],
+  imports: [
+    ReactiveFormsModule,
+    CommonModule,
+    RouterLink
+  ],
   templateUrl: './verify-otp.html',
   styleUrl: './verify-otp.css'
 })
 export class VerifyOtp {
 
   otpForm: FormGroup;
+
   phone = '';
+
   errorMessage = '';
   successMessage = '';
+
   isLoading = false;
+
+  toastMessage = '';
+  toastType: 'success' | 'error' = 'success';
 
   constructor(
     private fb: FormBuilder,
@@ -31,7 +41,13 @@ export class VerifyOtp {
   ) {
 
     this.otpForm = this.fb.group({
-      otp: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]]
+      otp: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern('^[0-9]{6}$')
+        ]
+      ]
     });
 
     this.route.queryParams.subscribe((params) => {
@@ -39,36 +55,69 @@ export class VerifyOtp {
     });
   }
 
+  showToast(
+    message: string,
+    type: 'success' | 'error'
+  ): void {
+
+    this.toastMessage = message;
+    this.toastType = type;
+
+    setTimeout(() => {
+      this.toastMessage = '';
+    }, 3000);
+  }
+
   onSubmit(): void {
 
+    // Invalid OTP
     if (this.otpForm.invalid) {
+
       this.otpForm.markAllAsTouched();
+
+      this.showToast(
+        'Please enter a valid 6-digit OTP.',
+        'error'
+      );
+
       return;
     }
 
     this.isLoading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
 
     const otp = this.otpForm.value.otp;
 
-    this.authService.verifyOtp(this.phone, otp).subscribe({
+    this.authService.verifyOtp(
+      this.phone,
+      otp
+    ).subscribe({
 
+      // OTP is correct
       next: () => {
+
         this.isLoading = false;
-        this.successMessage = 'OTP verified successfully';
+
+        this.toastMessage = 'OTP verified successfully!';
+        this.toastType = 'success';
 
         setTimeout(() => {
           this.router.navigate(['/login']);
-        }, 1000);
+        }, 3000);
       },
 
+      // OTP is wrong
       error: (error) => {
+
         this.isLoading = false;
 
-        this.errorMessage =
+        const message =
           error?.error ||
           'Invalid or expired OTP. Please try again.';
+
+        this.showToast(
+          message,
+          'error'
+        );
       }
 
     });

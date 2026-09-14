@@ -175,7 +175,11 @@ export const routes: Routes = [
       {
         path: 'referrals/:id',
         component: ReferralDetails
-      }
+      },
+        {
+      path: 'patients/:patientId/medical-history',
+      component: PatientMedicalHistory
+    },
 
     ]
   },
