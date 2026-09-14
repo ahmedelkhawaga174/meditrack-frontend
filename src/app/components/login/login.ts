@@ -1,60 +1,145 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
 import { AuthService } from '../../services/auth';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [
+    ReactiveFormsModule,
+    CommonModule,
+    RouterLink
+  ],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
 export class Login {
+
   loginForm: FormGroup;
-  errorMessage: string = '';
-  isLoading: boolean = false;
+
+  errorMessage = '';
+  isLoading = false;
+
+  toastMessage = '';
+  toastType: 'success' | 'error' = 'success';
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router
   ) {
+
     this.loginForm = this.fb.group({
-phone: ['', [Validators.required, Validators.pattern('^[0-9]{10,15}$')]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      phone: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern('^[0-9]{10,15}$')
+        ]
+      ],
+
+      password: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(6)
+        ]
+      ]
     });
   }
 
+  showToast(
+    message: string,
+    type: 'success' | 'error'
+  ): void {
+
+    this.toastMessage = message;
+    this.toastType = type;
+
+    setTimeout(() => {
+      this.toastMessage = '';
+    }, 3000);
+  }
+
   onSubmit(): void {
-    if (this.loginForm.invalid) return;
+
+    // Invalid form
+    if (this.loginForm.invalid) {
+
+      this.loginForm.markAllAsTouched();
+
+      this.showToast(
+        'Please enter a valid phone number and password.',
+        'error'
+      );
+
+      return;
+    }
 
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.authService.login(this.loginForm.value).subscribe({
+    this.authService.login(
+      this.loginForm.value
+    ).subscribe({
+
+      // Login successful
       next: (response) => {
+
         this.isLoading = false;
-      if (response.role === 'RECEPTIONIST') {
-  this.router.navigate(['/receptionist']);
 
-} else if (response.role === 'PATIENT') {
-  this.router.navigate(['/doctors']);
+        this.showToast(
+          'Login successful!',
+          'success'
+        );
 
-} else if (response.role === 'DOCTOR') {
-  this.router.navigate([
-    '/doctor',
-    response.userId
-  ]);
+        setTimeout(() => {
 
-} else if (response.role === 'SUPER_ADMIN') {
-  this.router.navigate(['/doctors']);
-}
+          if (response.role === 'RECEPTIONIST') {
+
+            this.router.navigate(['/receptionist']);
+
+          } else if (response.role === 'PATIENT') {
+
+            this.router.navigate(['/doctors']);
+
+          } else if (response.role === 'DOCTOR') {
+
+            this.router.navigate([
+              '/doctor',
+              response.userId
+            ]);
+
+          } else if (response.role === 'SUPER_ADMIN') {
+
+            this.router.navigate(['/doctors']);
+
+          }
+
+        }, 3000);
       },
+
+      // Login failed
       error: () => {
+
         this.isLoading = false;
-        this.errorMessage = 'password or phone number not correct';
+
+        this.errorMessage =
+          'Password or phone number not correct';
+
+        this.showToast(
+          'Password or phone number not correct.',
+          'error'
+        );
       }
+
     });
   }
 }
+

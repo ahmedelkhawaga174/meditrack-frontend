@@ -1,4 +1,21 @@
 <div class="flex min-h-screen items-center justify-center bg-gray-100">
+  @if (toastMessage) {
+  <div
+    class="fixed left-1/2 top-1/2 z-[9999] -translate-x-1/2 -translate-y-1/2 rounded-lg px-8 py-5 text-center text-sm font-semibold text-white shadow-xl"
+    [class.bg-green-500]="toastType === 'success'"
+    [class.bg-red-500]="toastType === 'error'"
+  >
+    {{ toastMessage }}
+
+    <button
+      type="button"
+      (click)="toastMessage = ''"
+      class="ml-4 font-bold"
+    >
+      ×
+    </button>
+  </div>
+}
   <div class="w-full max-w-md rounded-xl bg-white p-10 shadow-lg">
 
     <h2 class="mb-6 text-center text-2xl font-bold text-gray-800">
@@ -27,6 +44,7 @@
     </span>
   }
 </div>
+
 
       <div class="mb-5 flex flex-col">
         <label class="mb-2 font-semibold text-gray-600">
@@ -65,7 +83,15 @@
       >
         {{ isLoading ? 'Authenticating...' : 'Sign In' }}
       </button>
-
+<p class="mt-6 text-center text-sm text-gray-600">
+  Don't have an account?
+  <a
+    routerLink="/register"
+    class="font-semibold text-indigo-600 hover:underline"
+  >
+    Register
+  </a>
+</p>
     </form>
   </div>
 </div>
