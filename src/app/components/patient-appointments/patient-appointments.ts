@@ -7,6 +7,7 @@ import { PatientAppointmentService } from '../../services/PatientAppointmentServ
 import { AppointmentService } from '../../services/appointment';
 import { DoctorService } from '../../services/doctor';
 import { SlotResponse } from '../../models/doctor';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-patient-appointments',
@@ -20,6 +21,7 @@ export class PatientAppointments {
   private patientAppointmentService = inject(PatientAppointmentService);
   private appointmentService = inject(AppointmentService);
   private doctorService = inject(DoctorService);
+  private authService = inject(AuthService);
 
   patientId = input.required<number>();
 
@@ -43,7 +45,9 @@ export class PatientAppointments {
   ngOnInit(): void {
     this.loadAppointments();
   }
-
+isPatient(): boolean {
+  return this.authService.getUser()?.role === 'PATIENT';
+}
   loadAppointments(): void {
     this.isLoading.set(true);
     this.error.set('');
