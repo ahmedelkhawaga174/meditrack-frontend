@@ -1,22 +1,35 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { TestBed } from '@angular/core/testing';
 import { PatientNavbar } from './patient-navbar';
+import { provideRouter } from '@angular/router';
+import { AuthService } from '../../services/auth';
 
 describe('PatientNavbar', () => {
-  let component: PatientNavbar;
-  let fixture: ComponentFixture<PatientNavbar>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [PatientNavbar],
+      providers: [
+        provideRouter([]),
+        {
+          provide: AuthService,
+          useValue: {
+            getUser: () => ({
+              userId: 1,
+              patientId: 1,
+              role: 'PATIENT'
+            }),
+            logout: () => {}
+          }
+        }
+      ]
     }).compileComponents();
-
-    fixture = TestBed.createComponent(PatientNavbar);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
   });
 
   it('should create', () => {
+    const fixture = TestBed.createComponent(PatientNavbar);
+    const component = fixture.componentInstance;
+
     expect(component).toBeTruthy();
   });
+
 });

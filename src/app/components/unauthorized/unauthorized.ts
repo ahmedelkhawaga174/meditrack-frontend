@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { provideRouter } from '@angular/router';
 @Component({
   selector: 'app-unauthorized',
   imports: [RouterLink],

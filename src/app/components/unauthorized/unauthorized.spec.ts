@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { Unauthorized } from './unauthorized';
+import { provideRouter } from '@angular/router';
 
 describe('Unauthorized', () => {
   let component: Unauthorized;
@@ -9,11 +9,15 @@ describe('Unauthorized', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Unauthorized],
+      providers: [
+        provideRouter([])
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(Unauthorized);
     component = fixture.componentInstance;
-    await fixture.whenStable();
+
+    fixture.detectChanges();
   });
 
   it('should create', () => {
