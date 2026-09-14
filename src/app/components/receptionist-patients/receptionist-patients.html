@@ -1,0 +1,106 @@
+
+<div class="patients-page">
+
+  <div class="page-header">
+    <h1>Patients</h1>
+    <p>Search for a patient using their phone number.</p>
+  </div>
+
+
+  <!-- Search -->
+
+  <div class="search-card">
+
+    <h2>Search Patient</h2>
+
+    <form (ngSubmit)="searchPatients()">
+
+      <div class="search-box">
+
+        <input
+          type="text"
+          name="phone"
+          [(ngModel)]="phone"
+          placeholder="Enter patient phone number"
+        />
+
+        <button
+          type="submit"
+          [disabled]="isLoading"
+        >
+          {{ isLoading ? 'Searching...' : 'Search' }}
+        </button>
+
+      </div>
+
+    </form>
+
+    <p
+      class="error-message"
+      *ngIf="errorMessage"
+    >
+      {{ errorMessage }}
+    </p>
+
+  </div>
+
+
+  <!-- Patient Result -->
+
+  <div
+    class="results-card"
+    *ngIf="patients.length > 0"
+  >
+
+    <h2>Patient Information</h2>
+
+    <div
+      class="patient-card"
+      *ngFor="let patient of patients"
+    >
+
+      <div class="patient-header">
+
+        <div class="avatar">
+          {{ patient.firstName.charAt(0) }}
+        </div>
+
+        <div>
+         <a
+  class="patient-name" [routerLink]="['/receptionist/patients', patient.id, 'appointments']">
+  {{ patient.firstName }}
+  {{ patient.lastName }}
+</a>
+
+          <span>
+            Patient #{{ patient.id }}
+          </span>
+        </div>
+
+      </div>
+
+
+      <div class="patient-details">
+
+        <div class="detail">
+          <label>Phone</label>
+          <p>{{ patient.phone }}</p>
+        </div>
+
+        <div class="detail">
+          <label>Date of Birth</label>
+          <p>{{ patient.dateOfBirth }}</p>
+        </div>
+
+        <div class="detail">
+          <label>Gender</label>
+          <p>{{ patient.gender }}</p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

@@ -13,19 +13,30 @@ export class WaitingQueueService {
   private readonly apiUrl = 'http://localhost:8080/api/waiting-queue';
 
   getQueue(): Observable<WaitingQueue[]> {
-    return this.http.get<WaitingQueue[]>(this.apiUrl);
+    return this.http.get<WaitingQueue[]>(
+      this.apiUrl,
+      {
+        withCredentials: true
+      }
+    );
   }
 
   getQueueByStatus(status: QueueStatus): Observable<WaitingQueue[]> {
     return this.http.get<WaitingQueue[]>(
-      `${this.apiUrl}/status/${status}`
+      `${this.apiUrl}/status/${status}`,
+      {
+        withCredentials: true
+      }
     );
   }
 
   addToQueue(appointmentId: number): Observable<WaitingQueue> {
     return this.http.post<WaitingQueue>(
       `${this.apiUrl}/${appointmentId}`,
-      {}
+      {},
+      {
+        withCredentials: true
+      }
     );
   }
 
@@ -35,7 +46,10 @@ export class WaitingQueueService {
   ): Observable<WaitingQueue> {
     return this.http.patch<WaitingQueue>(
       `${this.apiUrl}/${queueId}/status`,
-      { status }
+      { status },
+      {
+        withCredentials: true
+      }
     );
   }
 }

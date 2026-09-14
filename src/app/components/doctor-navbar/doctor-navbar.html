@@ -1,0 +1,44 @@
+<nav class="navbar">
+
+  <div class="navbar-container">
+
+    <div class="logo">
+      <span class="logo-icon">✚</span>
+      <span>MediTrack</span>
+    </div>
+
+    <div class="nav-links">
+
+      <a
+        routerLink="appointments/upcoming"
+        routerLinkActive="active"
+      >
+        Upcoming Appointments
+      </a>
+
+      <a
+        routerLink="patients"
+        routerLinkActive="active"
+      >
+        My Patients
+      </a>
+
+      <a
+        routerLink="referrals/pending"
+        routerLinkActive="active"
+      >
+        Pending Referrals
+      </a>
+
+    </div>
+
+    <button
+      class="logout-btn"
+      (click)="logout()"
+    >
+      Logout
+    </button>
+
+  </div>
+
+</nav>

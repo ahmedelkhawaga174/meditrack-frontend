@@ -1,0 +1,57 @@
+<nav class="navbar">
+  <div class="navbar-container">
+
+    <!-- Logo -->
+    <div class="logo">
+      <span class="logo-icon">✚</span>
+      <span>MediTrack</span>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-links">
+
+      <a
+        routerLink="/doctors"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        Doctors
+      </a>
+
+      @if (patientId) {
+
+        <a
+          [routerLink]="['/patients', patientId, 'appointments']"
+          routerLinkActive="active"
+        >
+          My Appointments
+        </a>
+
+        <a
+          [routerLink]="['/patients', patientId, 'prescriptions']"
+          routerLinkActive="active"
+        >
+          My Prescriptions
+        </a>
+
+        <a
+          [routerLink]="['/patients', patientId, 'medical-history']"
+          routerLinkActive="active"
+        >
+          Medical History
+        </a>
+
+      }
+
+    </div>
+
+    <!-- Logout -->
+    <button
+      class="logout-btn"
+      (click)="logout()"
+    >
+      Logout
+    </button>
+
+  </div>
+</nav>

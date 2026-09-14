@@ -33,9 +33,23 @@ phone: ['', [Validators.required, Validators.pattern('^[0-9]{10,15}$')]],
     this.errorMessage = '';
 
     this.authService.login(this.loginForm.value).subscribe({
-      next: () => {
+      next: (response) => {
         this.isLoading = false;
-        this.router.navigate(['/doctors']);
+      if (response.role === 'RECEPTIONIST') {
+  this.router.navigate(['/receptionist']);
+
+} else if (response.role === 'PATIENT') {
+  this.router.navigate(['/doctors']);
+
+} else if (response.role === 'DOCTOR') {
+  this.router.navigate([
+    '/doctor',
+    response.userId
+  ]);
+
+} else if (response.role === 'SUPER_ADMIN') {
+  this.router.navigate(['/doctors']);
+}
       },
       error: () => {
         this.isLoading = false;

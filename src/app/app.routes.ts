@@ -18,11 +18,26 @@ import { DoctorPatientComponent } from './components/doctor-patient/doctor-patie
 import { ReferralDetails } from './components/referral-details/referral-details';
 import { PendingReferral } from './components/pending-referral/pending-referral';
 import { PatientPrescriptions } from './components/patient-prescriptions/patient-prescriptions';
+import { Unauthorized } from './components/unauthorized/unauthorized';
+
+import { roleGuard } from './guards/role-guard';
+
+import { ReceptionistLayout } from './layouts/receptionist-layout/receptionist-layout';
+import { ReceptionistPatients } from './components/receptionist-patients/receptionist-patients';
+
+import { PatientLayout } from './layouts/patient-layout/patient-layout';
+import { DoctorLayout } from './layouts/doctor-layout/doctor-layout';
+
+
 export const routes: Routes = [
+
+  // =====================================================
+  // PUBLIC
+  // =====================================================
 
   {
     path: '',
-    redirectTo: 'register',
+    redirectTo: 'login',
     pathMatch: 'full'
   },
 
@@ -42,80 +57,175 @@ export const routes: Routes = [
   },
 
   {
-    path: 'doctors',
-    component: DoctorSearch
+    path: 'unauthorized',
+    component: Unauthorized
   },
 
-  {
-    path: 'doctors/referrals/pending',
-    component: PendingReferrals
+
+  // =====================================================
+  // PATIENT
+  // =====================================================
+{
+  path: '',
+  component: PatientLayout,
+  canActivate: [roleGuard],
+  data: {
+    roles: ['PATIENT']
   },
 
+  children: [
+
+    {
+      path: 'doctors',
+      component: DoctorSearch
+    },
+
+    {
+      path: 'doctors/:doctorId',
+      component: DoctorDetails
+    },
+
+    {
+      path: 'patients/:patientId/appointments',
+      component: PatientAppointments
+    },
+
+    {
+      path: 'patients/:patientId/medical-history',
+      component: PatientMedicalHistory
+    },
+
+    {
+      path: 'patients/:patientId/prescriptions',
+      component: PatientPrescriptions
+    }
+
+  ]
+},
+
+
+  // =====================================================
+  // DOCTOR
+  // =====================================================
+
+  // Upcoming appointments
+ 
   {
-    path: 'patients/:patientId/medical-history',
-    component: PatientMedicalHistory
+    path: 'doctor/:doctorId',
+    component: DoctorLayout,
+
+    canActivate: [roleGuard],
+
+    data: {
+      roles: ['DOCTOR']
+    },
+
+    children: [
+
+      // /doctor/:doctorId
+      {
+        path: '',
+        redirectTo: 'appointments/upcoming',
+        pathMatch: 'full'
+      },
+
+      // /doctor/:doctorId/appointments/upcoming
+      {
+        path: 'appointments/upcoming',
+        component: UpcomingAppointments
+      },
+
+      // /doctor/:doctorId/patients
+      {
+        path: 'patients',
+        component: DoctorPatientComponent
+      },
+
+      // /doctor/:doctorId/referrals/pending
+      {
+        path: 'referrals/pending',
+        component: PendingReferral
+      },
+
+      // /doctor/:doctorId/consultations/:id
+      {
+        path: 'consultations/:id',
+        component: Consultation
+      },
+
+      // /doctor/:doctorId/consultations/:id/notes
+      {
+        path: 'consultations/:id/notes',
+        component: Note
+      },
+
+      // /doctor/:doctorId/appointments/:id/diagnosis
+      {
+        path: 'appointments/:id/diagnosis',
+        component: Diagnosis
+      },
+
+      // /doctor/:doctorId/referrals/create/:appointmentId
+      {
+        path: 'referrals/create/:appointmentId',
+        component: Referral
+      },
+
+      // /doctor/:doctorId/referrals/:id
+      {
+        path: 'referrals/:id',
+        component: ReferralDetails
+      }
+
+    ]
   },
 
-  {
-    path: 'patients/:patientId/prescriptions',
-    component: PatientPrescriptions
-  },
 
-  {
-    path: 'consultations/:id',
-    component: Consultation
-  },
-
-  {
-    path: 'doctors/:doctorId',
-    component: DoctorDetails
-  },
-
-  {
-    path: 'patients/:patientId/appointments',
-    component: PatientAppointments
-  },
+  // =====================================================
+  // RECEPTIONIST
+  // =====================================================
 
   {
     path: 'receptionist',
-    component: ReceptionistDashboard
+    component: ReceptionistLayout,
+
+    canActivate: [roleGuard],
+
+    data: {
+      roles: ['RECEPTIONIST']
+    },
+
+    children: [
+
+      // /receptionist
+      {
+        path: '',
+        component: ReceptionistDashboard
+      },
+
+      // /receptionist/patients
+      {
+        path: 'patients',
+        component: ReceptionistPatients
+      },
+
+      // /receptionist/patients/:patientId/appointments
+      {
+        path: 'patients/:patientId/appointments',
+        component: PatientAppointments
+      }
+
+    ]
   },
 
-  {
-    path: 'doctors/:doctorId/appointments/upcoming',
-    component: UpcomingAppointments
-  },
 
-  {
-    path: 'appointments/:id/diagnosis',
-    component: Diagnosis
-  },
+  // =====================================================
+  // FALLBACK
+  // =====================================================
 
-  {
-    path: 'consultations/:id/notes',
-    component: Note
-  },
-
-  {
-    path: 'doctors/:doctorId/patients',
-    component: DoctorPatientComponent
-  },
-
-  {
-    path: 'referrals/create/:appointmentId',
-    component: Referral
-  },
-  {
-    path: 'referrals/:id',
-    component: ReferralDetails,
-  },
-  {
-    path: 'doctors/:doctorId/referrals/pending',
-    component: PendingReferral,
-  },
   {
     path: '**',
-    redirectTo: 'register'
+    redirectTo: 'login'
   }
 
 ];

@@ -1,0 +1,32 @@
+<nav class="navbar">
+
+  <div class="navbar-container">
+
+    <!-- Logo -->
+    <div class="logo">
+      <span class="logo-icon">✚</span>
+      <span>MediTrack</span>
+    </div>
+
+    <!-- Navigation Links -->
+    <div class="nav-links">
+
+
+      <a routerLink="/receptionist/patients" routerLinkActive="active">
+        Patients
+      </a>
+
+      <a routerLink="/receptionist" fragment="waiting-queue" >
+        Waiting Queue
+      </a>
+
+    </div>
+
+    <!-- Logout -->
+    <button class="logout-btn" (click)="logout()">
+      Logout
+    </button>
+
+  </div>
+
+</nav>
