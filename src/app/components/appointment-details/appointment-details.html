@@ -1,0 +1,322 @@
+<div class="min-h-screen bg-gray-50 py-8">
+
+  <div class="mx-auto max-w-4xl px-6">
+
+    <!-- Back -->
+    <button
+      type="button"
+      (click)="goBack()"
+      class="mb-6 inline-flex items-center gap-2
+             text-sm font-medium text-blue-600
+             transition hover:text-blue-800"
+    >
+      ← Back to My Appointments
+    </button>
+
+
+    <!-- Loading -->
+    @if (isLoading()) {
+
+      <div
+        class="rounded-2xl bg-white p-12 text-center shadow-sm"
+      >
+
+        <div class="mb-4 text-4xl">
+          ⏳
+        </div>
+
+        <p class="text-gray-500">
+          Loading appointment details...
+        </p>
+
+      </div>
+
+    }
+
+
+    <!-- Error -->
+    @else if (error()) {
+
+      <div
+        class="rounded-2xl border border-red-200
+               bg-red-50 p-8 text-center"
+      >
+
+        <div class="mb-3 text-4xl">
+          ⚠️
+        </div>
+
+        <p class="font-medium text-red-600">
+          {{ error() }}
+        </p>
+
+        <button
+          type="button"
+          (click)="goBack()"
+          class="mt-5 rounded-lg bg-blue-600
+                 px-5 py-2.5 font-medium text-white
+                 transition hover:bg-blue-700"
+        >
+          Back to Appointments
+        </button>
+
+      </div>
+
+    }
+
+
+    <!-- Appointment -->
+    @else if (appointment(); as appt) {
+
+      <!-- Header Card -->
+      <div
+        class="mb-6 overflow-hidden rounded-2xl
+               border border-gray-200 bg-white shadow-sm"
+      >
+
+        <div
+          class="bg-gradient-to-r from-blue-600 to-indigo-600
+                 px-6 py-8 text-white"
+        >
+
+          <div
+            class="flex flex-col gap-4
+                   md:flex-row md:items-center
+                   md:justify-between"
+          >
+
+            <div>
+
+              <p class="mb-2 text-sm text-blue-100">
+                Appointment Details
+              </p>
+
+              <h1 class="text-3xl font-bold">
+                Dr. {{ appt.doctorName }}
+              </h1>
+
+              <p class="mt-2 text-blue-100">
+                {{ appt.specialization }}
+              </p>
+
+            </div>
+
+
+            <div>
+
+              <span [class]="statusClasses(appt.status)">
+                {{ appt.status }}
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- Main Information -->
+        <div class="p-6">
+
+          <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+
+            <!-- Doctor -->
+            <div
+              class="rounded-xl border border-gray-200
+                     bg-gray-50 p-5"
+            >
+
+              <div class="mb-3 text-2xl">
+                👨‍⚕️
+              </div>
+
+              <p class="text-xs font-semibold uppercase
+                        tracking-wide text-gray-500">
+                Doctor
+              </p>
+
+              <p class="mt-1 text-lg font-bold text-gray-900">
+                Dr. {{ appt.doctorName }}
+              </p>
+
+              <p class="mt-1 text-sm text-gray-600">
+                {{ appt.specialization }}
+              </p>
+
+            </div>
+
+
+            <!-- Department -->
+            <div
+              class="rounded-xl border border-gray-200
+                     bg-gray-50 p-5"
+            >
+
+              <div class="mb-3 text-2xl">
+                🏥
+              </div>
+
+              <p class="text-xs font-semibold uppercase
+                        tracking-wide text-gray-500">
+                Department
+              </p>
+
+              <p class="mt-1 text-lg font-bold text-gray-900">
+                {{ appt.departmentName || 'Not available' }}
+              </p>
+
+            </div>
+
+
+            <!-- Date -->
+            <div
+              class="rounded-xl border border-gray-200
+                     bg-gray-50 p-5"
+            >
+
+              <div class="mb-3 text-2xl">
+                📅
+              </div>
+
+              <p class="text-xs font-semibold uppercase
+                        tracking-wide text-gray-500">
+                Appointment Date
+              </p>
+
+              <p class="mt-1 text-lg font-bold text-gray-900">
+                {{ appt.date }}
+              </p>
+
+            </div>
+
+
+            <!-- Time -->
+            <div
+              class="rounded-xl border border-gray-200
+                     bg-gray-50 p-5"
+            >
+
+              <div class="mb-3 text-2xl">
+                🕐
+              </div>
+
+              <p class="text-xs font-semibold uppercase
+                        tracking-wide text-gray-500">
+                Appointment Time
+              </p>
+
+              <p class="mt-1 text-lg font-bold text-gray-900">
+
+                {{ appt.startTime }}
+
+                -
+
+                {{ appt.endTime }}
+
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- Notes -->
+          @if (appt.notes) {
+
+            <div
+              class="mt-6 rounded-xl border border-blue-200
+                     bg-blue-50 p-5"
+            >
+
+              <div class="mb-2 flex items-center gap-2">
+
+                <span class="text-xl">
+                  📝
+                </span>
+
+                <h3 class="font-semibold text-blue-900">
+                  Appointment Notes
+                </h3>
+
+              </div>
+
+              <p class="text-sm leading-6 text-blue-800">
+                {{ appt.notes }}
+              </p>
+
+            </div>
+
+          }
+
+
+          <!-- Appointment ID -->
+          <div
+            class="mt-6 rounded-xl bg-gray-50 p-4"
+          >
+
+            <div
+              class="flex items-center justify-between"
+            >
+
+              <span class="text-sm text-gray-500">
+                Appointment ID
+              </span>
+
+              <span class="font-bold text-gray-800">
+                #{{ appt.appointmentId }}
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- Actions -->
+          @if (
+            appt.status === 'PENDING' ||
+            appt.status === 'CONFIRMED'
+          ) {
+
+            <div
+              class="mt-6 flex flex-col gap-3
+                     sm:flex-row"
+            >
+
+              <button
+                type="button"
+                (click)="goBack()"
+                class="flex-1 rounded-lg
+                       bg-blue-600 px-5 py-3
+                       font-semibold text-white
+                       transition hover:bg-blue-700"
+              >
+                ← Back to Appointments
+              </button>
+
+            </div>
+
+          } @else {
+
+            <button
+              type="button"
+              (click)="goBack()"
+              class="mt-6 w-full rounded-lg
+                     bg-blue-600 px-5 py-3
+                     font-semibold text-white
+                     transition hover:bg-blue-700"
+            >
+              ← Back to Appointments
+            </button>
+
+          }
+
+        </div>
+
+      </div>
+
+    }
+
+  </div>
+
+</div>

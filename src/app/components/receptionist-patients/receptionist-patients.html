@@ -1,106 +1,297 @@
-
 <div class="patients-page">
 
+  <!-- Header -->
+
   <div class="page-header">
-    <h1>Patients</h1>
-    <p>Search for a patient using their phone number.</p>
-  </div>
 
+    <div>
 
-  <!-- Search -->
+      <h1>
+        My Patients
+      </h1>
 
-  <div class="search-card">
-
-    <h2>Search Patient</h2>
-
-    <form (ngSubmit)="searchPatients()">
-
-      <div class="search-box">
-
-        <input
-          type="text"
-          name="phone"
-          [(ngModel)]="phone"
-          placeholder="Enter patient phone number"
-        />
-
-        <button
-          type="submit"
-          [disabled]="isLoading"
-        >
-          {{ isLoading ? 'Searching...' : 'Search' }}
-        </button>
-
-      </div>
-
-    </form>
-
-    <p
-      class="error-message"
-      *ngIf="errorMessage"
-    >
-      {{ errorMessage }}
-    </p>
-
-  </div>
-
-
-  <!-- Patient Result -->
-
-  <div
-    class="results-card"
-    *ngIf="patients.length > 0"
-  >
-
-    <h2>Patient Information</h2>
-
-    <div
-      class="patient-card"
-      *ngFor="let patient of patients"
-    >
-
-      <div class="patient-header">
-
-        <div class="avatar">
-          {{ patient.firstName.charAt(0) }}
-        </div>
-
-        <div>
-         <a
-  class="patient-name" [routerLink]="['/receptionist/patients', patient.id, 'appointments']">
-  {{ patient.firstName }}
-  {{ patient.lastName }}
-</a>
-
-          <span>
-            Patient #{{ patient.id }}
-          </span>
-        </div>
-
-      </div>
-
-
-      <div class="patient-details">
-
-        <div class="detail">
-          <label>Phone</label>
-          <p>{{ patient.phone }}</p>
-        </div>
-
-        <div class="detail">
-          <label>Date of Birth</label>
-          <p>{{ patient.dateOfBirth }}</p>
-        </div>
-
-        <div class="detail">
-          <label>Gender</label>
-          <p>{{ patient.gender }}</p>
-        </div>
-
-      </div>
+      <p>
+        View and search patients registered in MediTrack.
+      </p>
 
     </div>
 
   </div>
+
+
+  <!-- Loading -->
+
+  @if (isLoading) {
+
+    <div class="loading-card">
+
+      <div class="spinner"></div>
+
+      <span>
+        Loading patients...
+      </span>
+
+    </div>
+
+  }
+
+
+  @if (!isLoading) {
+
+
+    <!-- Search -->
+
+    <div class="search-card">
+
+      <div class="search-header">
+
+        <div>
+
+          <h2>
+            Search Patients
+          </h2>
+
+          <p>
+            Search by patient name or phone number.
+          </p>
+
+        </div>
+
+
+        <span class="patient-count">
+
+          {{ filteredPatients.length }}
+
+          {{
+            filteredPatients.length === 1
+              ? 'Patient'
+              : 'Patients'
+          }}
+
+        </span>
+
+      </div>
+
+
+      <form
+        (ngSubmit)="searchPatients()"
+      >
+
+        <div class="search-box">
+
+          <input
+            type="text"
+            name="searchQuery"
+            [(ngModel)]="searchQuery"
+            placeholder="Search by name or phone number..."
+          />
+
+
+          @if (searchQuery) {
+
+            <button
+              type="button"
+              class="clear-btn"
+              (click)="clearSearch()"
+            >
+              Clear
+            </button>
+
+          }
+
+
+          <button
+            type="submit"
+            class="search-btn"
+          >
+            Search
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+
+    <!-- No Results -->
+
+    @if (
+      filteredPatients.length === 0
+    ) {
+
+      <div class="empty-card">
+
+        <div class="empty-icon">
+          🔍
+        </div>
+
+        <h2>
+          No Patients Found
+        </h2>
+
+        <p>
+          No patient matches your search.
+        </p>
+
+
+        @if (searchQuery) {
+
+          <button
+            type="button"
+            class="clear-search-btn"
+            (click)="clearSearch()"
+          >
+            Show All Patients
+          </button>
+
+        }
+
+      </div>
+
+    }
+
+
+    <!-- Patients -->
+
+    @if (
+      filteredPatients.length > 0
+    ) {
+
+      <div class="results-card">
+
+        <div class="results-header">
+
+          <div>
+
+            <h2>
+              Patients
+            </h2>
+
+            <p>
+              All registered patients
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="patients-list">
+
+          @for (
+            patient of filteredPatients;
+            track patient.id
+          ) {
+
+            <div class="patient-card">
+
+
+              <!-- Patient Header -->
+
+              <div class="patient-header">
+
+                <div class="avatar">
+
+                  {{
+                    patient.firstName
+                      .charAt(0)
+                      .toUpperCase()
+                  }}
+
+                </div>
+
+
+                <div class="patient-main">
+
+                  <a
+                    class="patient-name"
+                    [routerLink]="[
+                      '/receptionist/patients',
+                      patient.id,
+                      'appointments'
+                    ]"
+                  >
+
+                    {{ patient.firstName }}
+                    {{ patient.lastName }}
+
+                  </a>
+
+
+                  <span class="patient-id">
+
+                    Patient #{{ patient.id }}
+
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              <!-- Patient Details -->
+
+              <div class="patient-details">
+
+
+                <!-- Phone -->
+
+                <div class="detail">
+
+                  <label>
+                    Phone
+                  </label>
+
+                  <p>
+                    {{ patient.phone }}
+                  </p>
+
+                </div>
+
+
+                <!-- Date of Birth -->
+
+                <div class="detail">
+
+                  <label>
+                    Date of Birth
+                  </label>
+
+                  <p>
+                    {{ patient.dateOfBirth || '—' }}
+                  </p>
+
+                </div>
+
+
+                <!-- Gender -->
+
+                <div class="detail">
+
+                  <label>
+                    Gender
+                  </label>
+
+                  <p>
+                    {{ patient.gender || '—' }}
+                  </p>
+
+                </div>
+
+
+              </div>
+
+            </div>
+
+          }
+
+        </div>
+
+      </div>
+
+    }
+
+  }
 
 </div>

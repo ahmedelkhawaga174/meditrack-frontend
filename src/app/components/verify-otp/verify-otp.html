@@ -1,75 +1,87 @@
 <div class="relative flex min-h-screen items-center justify-center bg-gray-100">
 
-  <!-- Toast Message -->
-  
-@if (toastMessage) {
-  <div
-    class="fixed left-1/2 top-1/2 z-[9999] -translate-x-1/2 -translate-y-1/2 rounded-lg px-8 py-5 text-center text-sm font-semibold text-white shadow-xl"
-    [class.bg-green-500]="toastType === 'success'"
-    [class.bg-red-500]="toastType === 'error'"
-  >
-    {{ toastMessage }}
+  <div class="w-full max-w-md rounded-2xl bg-white p-10 shadow-xl">
 
-    <button
-      type="button"
-      (click)="toastMessage = ''"
-      class="ml-4 font-bold"
-    >
-      ×
-    </button>
-  </div>
-}
+    <!-- Icon -->
+    <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
+      <span class="text-3xl">🔐</span>
+    </div>
 
-  <div class="w-full max-w-md rounded-xl bg-white p-10 shadow-lg">
-
+    <!-- Title -->
     <h2 class="mb-2 text-center text-2xl font-bold text-gray-800">
-      Verify OTP
+      Verify Your Account
     </h2>
 
-    <p class="mb-6 text-center text-sm text-gray-500">
-      Enter the 6-digit OTP sent to your phone
+    <p class="mb-2 text-center text-sm text-gray-500">
+      Enter the 6-digit verification code
     </p>
 
+    @if (phone) {
+      <p class="mb-6 text-center text-sm text-gray-600">
+        Code sent to
+        <span class="font-semibold text-blue-600">
+          {{ phone }}
+        </span>
+      </p>
+    }
+
+    <!-- Form -->
     <form
       [formGroup]="otpForm"
       (ngSubmit)="onSubmit()"
       class="space-y-5"
     >
 
+      <!-- OTP -->
       <div>
-        <label class="mb-1 block text-sm font-medium text-gray-700">
-          OTP
+
+        <label class="mb-2 block text-sm font-semibold text-gray-700">
+          Verification Code
         </label>
 
         <input
           type="text"
           maxlength="6"
+          inputmode="numeric"
+          autocomplete="one-time-code"
           formControlName="otp"
-          placeholder="Enter OTP"
-          class="w-full rounded-lg border border-gray-300 px-4 py-3 text-center text-lg tracking-widest outline-none focus:border-blue-500"
+          placeholder="Enter 6-digit OTP"
+          class="w-full rounded-xl border border-gray-300 px-4 py-4 text-center text-xl font-semibold tracking-[0.5em] outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
         />
 
         @if (
           otpForm.get('otp')?.touched &&
           otpForm.get('otp')?.invalid
         ) {
-          <p class="mt-1 text-sm text-red-500">
-            Please enter a valid 6-digit OTP
+
+          <p class="mt-2 text-center text-sm text-red-500">
+            Please enter a valid 6-digit OTP.
           </p>
+
         }
+
       </div>
 
+      <!-- Submit -->
       <button
         type="submit"
         [disabled]="isLoading"
-        class="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+        class="w-full rounded-xl bg-blue-600 px-4 py-3.5 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {{ isLoading ? 'Verifying...' : 'Verify OTP' }}
+
+        @if (isLoading) {
+          Verifying...
+        } @else {
+          Verify Account
+        }
+
       </button>
 
     </form>
 
+    <!-- Login -->
     <p class="mt-6 text-center text-sm text-gray-600">
+
       Already verified?
 
       <a
@@ -78,9 +90,9 @@
       >
         Login
       </a>
+
     </p>
 
   </div>
 
 </div>
-

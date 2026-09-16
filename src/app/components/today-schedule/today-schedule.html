@@ -1,42 +1,47 @@
 <div class="p-6 bg-slate-50 min-h-screen">
+
   <div class="max-w-5xl mx-auto space-y-6">
 
     <!-- Header -->
-    <div
-      class="flex items-center justify-between border-b border-slate-200 pb-4"
-    >
+    <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+
       <div>
+
         <h1 class="text-2xl font-bold text-slate-900">
-          Upcoming Appointments
+          Today's Schedule
         </h1>
 
         <p class="text-sm text-slate-500">
-          View future scheduled appointments and patient slots.
+          View today's scheduled appointments and patient slots.
         </p>
+
       </div>
 
       <button
-        (click)="fetchUpcomingAppointments()"
+        (click)="fetchTodaySchedule()"
         class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors flex items-center space-x-2 shadow-sm"
       >
+
         <svg
           class="w-4 h-4 text-slate-500"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
+
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
           />
+
         </svg>
 
-        <span>
-          Refresh
-        </span>
+        <span>Refresh</span>
+
       </button>
+
     </div>
 
 
@@ -53,17 +58,17 @@
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
+
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 01-18 0z"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
           />
+
         </svg>
 
-        <span>
-          {{ errorMessage() }}
-        </span>
+        <span>{{ errorMessage() }}</span>
 
       </div>
 
@@ -80,7 +85,7 @@
         ></div>
 
         <span class="ml-3 text-sm text-slate-500">
-          Loading appointments...
+          Loading today's schedule...
         </span>
 
       </div>
@@ -88,12 +93,11 @@
     }
 
 
-    <!-- Appointments -->
+    <!-- Content -->
     @if (!isLoading() && !errorMessage()) {
 
       @if (appointments().length === 0) {
 
-        <!-- Empty State -->
         <div
           class="bg-white rounded-xl border border-slate-200 p-12 text-center"
         >
@@ -104,29 +108,28 @@
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
+
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
               d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
             />
+
           </svg>
 
-          <h3
-            class="text-base font-semibold text-slate-800"
-          >
-            No Upcoming Appointments
+          <h3 class="text-base font-semibold text-slate-800">
+            No Appointments Today
           </h3>
 
           <p class="text-sm text-slate-500 mt-1">
-            There are no future appointments currently scheduled for you.
+            There are no appointments scheduled for you today.
           </p>
 
         </div>
 
       } @else {
 
-        <!-- Appointments Table -->
         <div
           class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
         >
@@ -173,101 +176,50 @@
                 track $index
               ) {
 
-                <tr
-                  class="hover:bg-slate-50 transition-colors"
-                >
+                <tr class="hover:bg-slate-50 transition-colors">
 
-                  <!-- Patient ID -->
-                  <td
-                    class="py-4 px-6 font-mono font-medium text-slate-600"
-                  >
+                  <td class="py-4 px-6 font-mono font-medium text-slate-600">
                     #{{ apt.patientId }}
                   </td>
 
-
-                  <!-- Patient Name -->
-                  <td
-                    class="py-4 px-6 font-semibold text-slate-900"
-                  >
+                  <td class="py-4 px-6 font-semibold text-slate-900">
                     {{ apt.patientName }}
                   </td>
 
-
-                  <!-- Date -->
                   <td class="py-4 px-6">
 
                     <span
                       class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100"
                     >
+
                       {{ apt.date | date:'mediumDate' }}
+
                     </span>
 
                   </td>
 
+                  <td class="py-4 px-6 font-medium text-slate-600">
 
-                  <!-- Time -->
-                  <td
-                    class="py-4 px-6 font-medium text-slate-600"
-                  >
                     {{ apt.slot.startTime }}
                     -
                     {{ apt.slot.endTime }}
+
                   </td>
 
+                  <td class="py-4 px-6 text-right">
 
-                  <!-- Actions -->
-                  <td
-                    class="py-4 px-6 text-right"
-                  >
-
-                    <div
-                      class="flex justify-end items-center gap-2"
+                    <a
+                      [routerLink]="[
+                        '/doctor',
+                        doctorId(),
+                        'patients',
+                        apt.patientId,
+                        'medical-history'
+                      ]"
+                      class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
                     >
-
-                      <!-- Consultation -->
-                      <a
-                        [routerLink]="[
-                          '/doctor',
-                          doctorId(),
-                          'consultations',
-                          apt.appointmentId
-                        ]"
-                        class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors"
-                      >
-                        Consultation
-                      </a>
-
-
-                      <!-- Medical History -->
-                      <a
-                        [routerLink]="[
-                          '/doctor',
-                          doctorId(),
-                          'patients',
-                          apt.patientId,
-                          'medical-history'
-                        ]"
-                        class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
-                      >
-                        Medical History
-                      </a>
-
-
-                      <!-- Create Referral -->
-                      <a
-                        [routerLink]="[
-                          '/doctor',
-                          doctorId(),
-                          'referrals',
-                          'create',
-                          apt.appointmentId
-                        ]"
-                        class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors"
-                      >
-                        Create Referral
-                      </a>
-
-                    </div>
+                      Medical History
+                    </a>
 
                   </td>
 
@@ -286,4 +238,5 @@
     }
 
   </div>
+
 </div>

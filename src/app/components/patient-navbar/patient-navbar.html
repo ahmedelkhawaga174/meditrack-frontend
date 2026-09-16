@@ -17,6 +17,12 @@
       >
         Doctors
       </a>
+      <a
+  [routerLink]="['/patients', patientId, 'profile']"
+  routerLinkActive="active"
+>
+  My Profile
+</a>
 
       @if (patientId) {
 

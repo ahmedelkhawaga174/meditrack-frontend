@@ -2,10 +2,8 @@ import { Component, inject, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
-import { DoctorResponse, SlotResponse } from '../../models/doctor';
+import { DoctorResponse } from '../../models/doctor';
 import { DoctorService } from '../../services/doctor';
-import { AppointmentService } from '../../services/appointment';
-import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-doctor-details',
@@ -17,30 +15,26 @@ import { AuthService } from '../../services/auth';
 export class DoctorDetails {
 
   private doctorService = inject(DoctorService);
-  private appointmentService = inject(AppointmentService);
-  private authService = inject(AuthService);
   private router = inject(Router);
 
   doctorId = input.required<number>();
 
   doctor = signal<DoctorResponse | null>(null);
-  selectedSlot = signal<SlotResponse | null>(null);
 
   isLoading = signal(true);
-  isBooking = signal(false);
-
   error = signal('');
-  bookingMessage = signal('');
 
   ngOnInit(): void {
     this.loadDoctor();
   }
 
   loadDoctor(): void {
+
     this.isLoading.set(true);
     this.error.set('');
 
     this.doctorService.getDoctorById(this.doctorId()).subscribe({
+
       next: (data) => {
         this.doctor.set(data);
         this.isLoading.set(false);
@@ -49,79 +43,25 @@ export class DoctorDetails {
       error: (err) => {
         console.error(err);
 
-        this.error.set('Unable to load doctor information.');
-        this.isLoading.set(false);
-      }
-    });
-  }
-
-  selectSlot(slot: SlotResponse): void {
-    this.selectedSlot.set(slot);
-    this.bookingMessage.set('');
-  }
-
-  bookAppointment(): void {
-    const doctor = this.doctor();
-    const slot = this.selectedSlot();
-    const user = this.authService.getUser();
-
-    if (!doctor || !slot) {
-      return;
-    }
-
-    // Make sure a patient is logged in
-    if (!user || !user.patientId) {
-      this.error.set(
-        'Patient information not found. Please login again.'
-      );
-      return;
-    }
-
-    this.isBooking.set(true);
-    this.error.set('');
-    this.bookingMessage.set('');
-
-    this.appointmentService.bookAppointment({
-      patientId: user.patientId,
-      doctorId: doctor.id,
-      slotId: slot.id,
-      notes: 'First consultation'
-    }).subscribe({
-
-      // Booking successful
-      next: (appointment) => {
-        this.isBooking.set(false);
-
-        this.bookingMessage.set(
-          `Appointment booked successfully. Appointment ID: ${appointment.id}`
+        this.error.set(
+          'Unable to load doctor information.'
         );
 
-        this.selectedSlot.set(null);
-
-        // Navigate automatically to My Appointments
-        this.router.navigate([
-          '/patients',
-          user.patientId,
-          'appointments'
-        ]);
-      },
-
-      // Booking failed
-      error: (err) => {
-        console.error(err);
-
-        this.isBooking.set(false);
-
-        if (err.status === 409) {
-          this.error.set(
-            'This slot is already booked. Please choose another slot.'
-          );
-        } else {
-          this.error.set(
-            'Unable to book appointment. Please try again.'
-          );
-        }
+        this.isLoading.set(false);
       }
+
     });
+  }
+
+  makeAppointment(): void {
+    this.router.navigate([
+      '/doctors',
+      this.doctorId(),
+      'appointments'
+    ]);
+  }
+
+  goBack(): void {
+    this.router.navigate(['/doctors']);
   }
 }

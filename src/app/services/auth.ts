@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
+
 import {
   LoginRequest,
   LoginResponse,
   RegisterRequest,
   RegisterResponse
 } from '../models/auth';
+
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+
+import { Router } from '@angular/router';
 
 export const USER_KEY = 'auth_user';
 
@@ -15,32 +19,66 @@ export const USER_KEY = 'auth_user';
 })
 export class AuthService {
 
-  private readonly apiUrl = 'http://localhost:8080/api/auth';
+  private readonly apiUrl =
+    'http://localhost:8080/api/auth';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {}
 
+
+  // =====================================================
   // LOGIN
-  login(credentials: LoginRequest): Observable<LoginResponse> {
+  // =====================================================
+
+  login(
+    credentials: LoginRequest
+  ): Observable<LoginResponse> {
+
     return this.http.post<LoginResponse>(
       `${this.apiUrl}/login`,
       credentials,
-      { withCredentials: true }
+      {
+        withCredentials: true
+      }
     ).pipe(
-      tap((response) => this.saveSession(response))
+
+      tap((response) => {
+        this.saveSession(response);
+      })
+
     );
   }
 
+
+  // =====================================================
   // REGISTER
-  register(request: RegisterRequest): Observable<RegisterResponse> {
+  // =====================================================
+
+  register(
+    request: RegisterRequest
+  ): Observable<RegisterResponse> {
+
     return this.http.post<RegisterResponse>(
       `${this.apiUrl}/register`,
       request,
-      { withCredentials: true }
+      {
+        withCredentials: true
+      }
     );
   }
 
+
+  // =====================================================
   // VERIFY OTP
-  verifyOtp(phone: string, otp: string): Observable<string> {
+  // =====================================================
+
+  verifyOtp(
+    phone: string,
+    otp: string
+  ): Observable<string> {
+
     return this.http.post(
       `${this.apiUrl}/verify-otp`,
       {
@@ -54,36 +92,71 @@ export class AuthService {
     );
   }
 
+
+  // =====================================================
   // GET LOGGED-IN USER
+  // =====================================================
+
   getUser(): LoginResponse | null {
-    const raw = localStorage.getItem(USER_KEY);
+
+    const raw =
+      localStorage.getItem(USER_KEY);
 
     if (!raw) {
       return null;
     }
 
     try {
+
       return JSON.parse(raw) as LoginResponse;
+
     } catch {
+
       return null;
+
     }
   }
 
+
+  // =====================================================
   // CHECK LOGIN
+  // =====================================================
+
   isLoggedIn(): boolean {
+
     return !!this.getUser();
+
   }
 
+
+  // =====================================================
   // LOGOUT
+  // =====================================================
+
   logout(): void {
+
+    // Remove frontend session
     localStorage.removeItem(USER_KEY);
+
+    // Go back to login page
+    this.router.navigate(['/login']);
+
   }
 
+
+  // =====================================================
   // SAVE USER DATA
-  private saveSession(response: LoginResponse): void {
+  // =====================================================
+
+  private saveSession(
+    response: LoginResponse
+  ): void {
+
     localStorage.setItem(
       USER_KEY,
       JSON.stringify(response)
     );
+
   }
+
 }

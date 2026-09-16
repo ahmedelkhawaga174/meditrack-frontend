@@ -1,44 +1,28 @@
 <nav class="navbar">
-
   <div class="navbar-container">
-
     <div class="logo">
       <span class="logo-icon">✚</span>
       <span>MediTrack</span>
     </div>
 
     <div class="nav-links">
+      <a routerLink="availability" routerLinkActive="active">
+        Manage Availability
+      </a>
 
-      <a
-        routerLink="appointments/upcoming"
-        routerLinkActive="active"
-      >
+      <a routerLink="appointments/upcoming" routerLinkActive="active">
         Upcoming Appointments
       </a>
 
-      <a
-        routerLink="patients"
-        routerLinkActive="active"
-      >
-        My Patients
+      <a routerLink="appointments/today" routerLinkActive="active">
+        Today's Schedule
       </a>
 
-      <a
-        routerLink="referrals/pending"
-        routerLinkActive="active"
-      >
-        Pending Referrals
-      </a>
+      <a routerLink="patients" routerLinkActive="active"> My Patients </a>
 
+      <a routerLink="referrals" routerLinkActive="active"> Referrals </a>
     </div>
 
-    <button
-      class="logout-btn"
-      (click)="logout()"
-    >
-      Logout
-    </button>
-
+    <button class="logout-btn" (click)="logout()">Logout</button>
   </div>
-
 </nav>

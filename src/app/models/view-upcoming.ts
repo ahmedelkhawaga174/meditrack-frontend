@@ -4,6 +4,7 @@ export interface AvailabilitySlotResponse {
 }
 
 export interface ViewUpcomingAppointmentResponse {
+  appointmentId: number;
   patientId: number;
   patientName: string;
   slot: AvailabilitySlotResponse;

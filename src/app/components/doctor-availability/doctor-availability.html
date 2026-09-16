@@ -1,0 +1,292 @@
+<div class="availability-page">
+
+  <div class="page-header">
+    <div>
+      <h1>Manage Availability</h1>
+      <p>
+        Create and manage your available appointment slots.
+      </p>
+    </div>
+  </div>
+
+
+  <!-- =====================================================
+       CREATE AVAILABILITY
+       ===================================================== -->
+
+  <div class="availability-card">
+
+    <h2>Create Availability</h2>
+
+    <p class="section-description">
+      Select your working hours and the duration of each appointment slot.
+    </p>
+
+    <form
+      class="availability-form"
+      (ngSubmit)="createAvailability()"
+    >
+
+      <div class="form-group">
+
+        <label for="date">
+          Date
+        </label>
+
+        <input
+          id="date"
+          type="date"
+          name="date"
+          [(ngModel)]="date"
+          required
+        />
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="startTime">
+          Start Time
+        </label>
+
+        <input
+          id="startTime"
+          type="time"
+          name="startTime"
+          [(ngModel)]="startTime"
+          required
+        />
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="endTime">
+          End Time
+        </label>
+
+        <input
+          id="endTime"
+          type="time"
+          name="endTime"
+          [(ngModel)]="endTime"
+          required
+        />
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="duration">
+          Slot Duration
+        </label>
+
+        <select
+          id="duration"
+          name="duration"
+          [(ngModel)]="slotDurationMinutes"
+        >
+
+          <option [ngValue]="15">
+            15 minutes
+          </option>
+
+          <option [ngValue]="30">
+            30 minutes
+          </option>
+
+          <option [ngValue]="45">
+            45 minutes
+          </option>
+
+          <option [ngValue]="60">
+            60 minutes
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="form-action">
+
+        <button
+          type="submit"
+          [disabled]="isCreating"
+        >
+
+          {{ isCreating ? 'Generating...' : 'Generate Slots' }}
+
+        </button>
+
+      </div>
+
+    </form>
+
+
+    <!-- SUCCESS -->
+
+    <div
+      *ngIf="successMessage"
+      class="success-message"
+    >
+      {{ successMessage }}
+    </div>
+
+
+    <!-- ERROR -->
+
+    <div
+      *ngIf="errorMessage"
+      class="error-message"
+    >
+      {{ errorMessage }}
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       DOCTOR SLOTS
+       ===================================================== -->
+
+  <div class="slots-card">
+
+    <div class="slots-header">
+
+      <div>
+        <h2>My Availability Slots</h2>
+
+        <p>
+          View and manage your appointment slots.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        class="refresh-btn"
+        (click)="loadAvailability()"
+        [disabled]="isLoading"
+      >
+        Refresh
+      </button>
+
+    </div>
+
+
+    <!-- LOADING -->
+
+    <div
+      *ngIf="isLoading"
+      class="loading"
+    >
+      Loading availability slots...
+    </div>
+
+
+    <!-- EMPTY -->
+
+    <div
+      *ngIf="!isLoading && slots.length === 0"
+      class="empty-state"
+    >
+      <h3>No availability slots</h3>
+
+      <p>
+        Create your first availability above.
+      </p>
+    </div>
+
+
+    <!-- TABLE -->
+
+    <div
+      *ngIf="!isLoading && slots.length > 0"
+      class="table-container"
+    >
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Date
+            </th>
+
+            <th>
+              Time
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Action
+            </th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          <tr *ngFor="let slot of slots">
+
+            <td>
+              {{ slot.date }}
+            </td>
+
+            <td class="time-cell">
+              {{ slot.startTime.substring(0, 5) }}
+              -
+              {{ slot.endTime.substring(0, 5) }}
+            </td>
+
+            <td>
+
+              <span
+                class="status"
+                [ngClass]="getStatusClass(slot.status)"
+              >
+                {{ slot.status }}
+              </span>
+
+            </td>
+
+            <td>
+
+              <button
+                *ngIf="slot.status === 'AVAILABLE'"
+                type="button"
+                class="delete-btn"
+                (click)="deleteSlot(slot)"
+              >
+                Delete
+              </button>
+
+              <span
+                *ngIf="slot.status !== 'AVAILABLE'"
+                class="no-action"
+              >
+                Not available
+              </span>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

@@ -6,13 +6,13 @@ import { ViewUpcomingAppointmentResponse } from '../../models/view-upcoming';
 import { UpcomingAppointmentsService } from '../../services/upcoming-appointment';
 
 @Component({
-  selector: 'app-upcoming-appointments',
+  selector: 'app-today-schedule',
   standalone: true,
   imports: [DatePipe, RouterLink],
-  templateUrl: './upcoming-appointments.html',
-  styleUrl: './upcoming-appointments.css',
+  templateUrl: './today-schedule.html',
+  styleUrl: './today-schedule.css',
 })
-export class UpcomingAppointments implements OnInit {
+export class TodaySchedule implements OnInit {
 
   private appointmentsService = inject(UpcomingAppointmentsService);
   private route = inject(ActivatedRoute);
@@ -25,8 +25,6 @@ export class UpcomingAppointments implements OnInit {
 
   ngOnInit(): void {
 
-    // doctorId موجود في الـ parent route:
-    // /doctor/:doctorId/appointments/upcoming
     const idFromRoute =
       this.route.parent?.snapshot.paramMap.get('doctorId');
 
@@ -46,16 +44,15 @@ export class UpcomingAppointments implements OnInit {
 
     this.doctorId.set(parsedDoctorId);
 
-    this.fetchUpcomingAppointments();
+    this.fetchTodaySchedule();
   }
 
-  fetchUpcomingAppointments(): void {
+  fetchTodaySchedule(): void {
 
     const id = this.doctorId();
 
     if (!id) {
       this.errorMessage.set('Doctor ID is missing.');
-      this.isLoading.set(false);
       return;
     }
 
@@ -63,23 +60,25 @@ export class UpcomingAppointments implements OnInit {
     this.errorMessage.set(null);
 
     this.appointmentsService
-      .getUpcomingAppointments(id)
+      .getTodaySchedule(id)
       .subscribe({
 
         next: (data) => {
+
           this.appointments.set(data);
           this.isLoading.set(false);
+
         },
 
         error: (err) => {
 
           console.error(
-            'Error fetching upcoming appointments:',
+            'Error fetching today schedule:',
             err
           );
 
           this.errorMessage.set(
-            'Failed to load upcoming appointments. Please try again later.'
+            'Failed to load today schedule. Please try again later.'
           );
 
           this.isLoading.set(false);
