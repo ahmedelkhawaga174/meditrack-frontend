@@ -8,9 +8,11 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-verify-otp',
+  standalone: true,
   imports: [
     ReactiveFormsModule,
     CommonModule,
@@ -29,9 +31,6 @@ export class VerifyOtp {
   successMessage = '';
 
   isLoading = false;
-
-  toastMessage = '';
-  toastType: 'success' | 'error' = 'success';
 
   constructor(
     private fb: FormBuilder,
@@ -55,30 +54,35 @@ export class VerifyOtp {
     });
   }
 
-  showToast(
-    message: string,
-    type: 'success' | 'error'
-  ): void {
-
-    this.toastMessage = message;
-    this.toastType = type;
-
-    setTimeout(() => {
-      this.toastMessage = '';
-    }, 3000);
-  }
-
   onSubmit(): void {
 
-    // Invalid OTP
+    // Validate OTP form
     if (this.otpForm.invalid) {
 
       this.otpForm.markAllAsTouched();
 
-      this.showToast(
-        'Please enter a valid 6-digit OTP.',
-        'error'
-      );
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid OTP',
+        text: 'Please enter a valid 6-digit OTP.',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#2563eb'
+      });
+
+      return;
+    }
+
+    if (!this.phone) {
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Phone Number Missing',
+        text: 'We could not find the phone number. Please register again.',
+        confirmButtonText: 'Go to Register',
+        confirmButtonColor: '#2563eb'
+      }).then(() => {
+        this.router.navigate(['/register']);
+      });
 
       return;
     }
@@ -92,34 +96,50 @@ export class VerifyOtp {
       otp
     ).subscribe({
 
-      // OTP is correct
+      // ==============================
+      // SUCCESS
+      // ==============================
       next: () => {
 
         this.isLoading = false;
 
-        this.toastMessage = 'OTP verified successfully!';
-        this.toastType = 'success';
+        Swal.fire({
+          icon: 'success',
+          title: 'Account Verified! 🎉',
+          text: 'Your MediTrack account has been successfully verified.',
+          confirmButtonText: 'Continue to Login',
+          confirmButtonColor: '#2563eb',
+          timer: 3000,
+          timerProgressBar: true
+        }).then(() => {
 
-        setTimeout(() => {
           this.router.navigate(['/login']);
-        }, 3000);
+
+        });
       },
 
-      // OTP is wrong
+      // ==============================
+      // ERROR
+      // ==============================
       error: (error) => {
+
+        console.error('OTP verification error:', error);
 
         this.isLoading = false;
 
         const message =
           error?.error ||
+          error?.error?.message ||
           'Invalid or expired OTP. Please try again.';
 
-        this.showToast(
-          message,
-          'error'
-        );
+        Swal.fire({
+          icon: 'error',
+          title: 'Verification Failed',
+          text: message,
+          confirmButtonText: 'Try Again',
+          confirmButtonColor: '#2563eb'
+        });
       }
-
     });
   }
 }

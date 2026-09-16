@@ -1,10 +1,28 @@
 import { inject, Injectable } from '@angular/core';
-import { ConsultationRequest, ConsultationResponse } from '../models/consultation-response-request';
+
+import {
+  ConsultationRequest,
+  ConsultationResponse
+} from '../models/consultation-response-request';
+
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { DiagnosisResponse, RecordDiagnosisRequest } from '../models/record-diagnoses';
-import { NoteRequest, NoteResponse } from '../models/note-response-request';
-import { PrescriptionRequest, PatientPrescriptionResponse } from '../models/prescription';
+
+import {
+  DiagnosisResponse,
+  RecordDiagnosisRequest
+} from '../models/record-diagnoses';
+
+import {
+  NoteRequest,
+  NoteResponse
+} from '../models/note-response-request';
+
+import {
+  PrescriptionRequest,
+  PatientPrescriptionResponse
+} from '../models/prescription';
+
 
 @Injectable({
   providedIn: 'root',
@@ -15,60 +33,133 @@ export class ConsultationService {
 
   private apiUrl = 'http://localhost:8080/api/consultations';
 
+
+  // =====================================================
+  // RECORD CONSULTATION
+  // =====================================================
+
   recordConsultation(
     request: ConsultationRequest
   ): Observable<ConsultationResponse> {
+
     return this.http.post<ConsultationResponse>(
       this.apiUrl,
-      request
+      request,
+      {
+        withCredentials: true
+      }
     );
   }
+
+
+  // =====================================================
+  // GET PATIENT PRESCRIPTIONS
+  // =====================================================
 
   getPatientPrescriptions(
     patientId: number
   ): Observable<PatientPrescriptionResponse[]> {
+
     return this.http.get<PatientPrescriptionResponse[]>(
-      `http://localhost:8080/api/patients/${patientId}/prescription`
+      `http://localhost:8080/api/patients/${patientId}/prescription`,
+      {
+        withCredentials: true
+      }
     );
   }
+
+
+  // =====================================================
+  // RECORD DIAGNOSIS
+  // =====================================================
 
   recordDiagnosis(
     consultationId: number,
     request: RecordDiagnosisRequest
   ): Observable<DiagnosisResponse> {
+
     return this.http.post<DiagnosisResponse>(
       `${this.apiUrl}/${consultationId}/diagnoses`,
-      request
+      request,
+      {
+        withCredentials: true
+      }
     );
   }
+
+
+  // =====================================================
+  // UPDATE DIAGNOSIS
+  // =====================================================
+
+  updateDiagnosis(
+    consultationId: number,
+    request: RecordDiagnosisRequest
+  ): Observable<DiagnosisResponse> {
+
+    return this.http.put<DiagnosisResponse>(
+      `${this.apiUrl}/${consultationId}/diagnoses`,
+      request,
+      {
+        withCredentials: true
+      }
+    );
+  }
+
+
+  // =====================================================
+  // ISSUE PRESCRIPTION
+  // =====================================================
 
   issuePrescription(
     consultationId: number,
     request: PrescriptionRequest
   ): Observable<PatientPrescriptionResponse> {
+
     return this.http.post<PatientPrescriptionResponse>(
       `${this.apiUrl}/${consultationId}/prescriptions`,
-      request
+      request,
+      {
+        withCredentials: true
+      }
     );
   }
+
+
+  // =====================================================
+  // ADD NOTE
+  // =====================================================
 
   addNoteToConsultation(
     consultationId: number,
     request: NoteRequest
   ): Observable<ConsultationResponse> {
+
     return this.http.post<ConsultationResponse>(
       `${this.apiUrl}/${consultationId}/notes`,
-      request
+      request,
+      {
+        withCredentials: true
+      }
     );
   }
+
+
+  // =====================================================
+  // UPDATE NOTE
+  // =====================================================
 
   updateNote(
     consultationId: number,
     request: NoteRequest
   ): Observable<ConsultationResponse> {
+
     return this.http.put<ConsultationResponse>(
       `${this.apiUrl}/${consultationId}/notes`,
-      request
+      request,
+      {
+        withCredentials: true
+      }
     );
   }
 }

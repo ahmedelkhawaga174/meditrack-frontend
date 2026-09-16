@@ -1,4 +1,10 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  inject,
+  ChangeDetectorRef,
+  OnInit
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -16,59 +22,151 @@ import { PatientInfo } from '../../models/patient';
   templateUrl: './receptionist-patients.html',
   styleUrl: './receptionist-patients.css'
 })
-export class ReceptionistPatients {
+export class ReceptionistPatients implements OnInit {
 
   private patientService = inject(Patient);
   private cdr = inject(ChangeDetectorRef);
 
-  phone = '';
+  searchQuery = '';
 
   patients: PatientInfo[] = [];
 
+  filteredPatients: PatientInfo[] = [];
+
   isLoading = false;
+
   errorMessage = '';
 
-  searchPatients(): void {
 
-    if (!this.phone.trim()) {
-      this.errorMessage = 'Please enter a phone number';
-      this.patients = [];
+  // =====================================================
+  // INIT
+  // =====================================================
 
-      this.cdr.detectChanges();
+  ngOnInit(): void {
+    this.loadPatients();
+  }
 
-      return;
-    }
+
+  // =====================================================
+  // LOAD ALL PATIENTS
+  // =====================================================
+
+  loadPatients(): void {
 
     this.isLoading = true;
     this.errorMessage = '';
-    this.patients = [];
 
-    this.patientService.searchPatients(this.phone.trim())
+    this.patientService
+      .getAllPatients()
       .subscribe({
 
         next: (response) => {
 
-          console.log('RESPONSE FROM BACKEND:', response);
-
           this.patients = response;
+
+          this.filteredPatients = response;
+
           this.isLoading = false;
 
-          console.log('PATIENTS:', this.patients);
-
-          // Force Angular to update the UI
           this.cdr.detectChanges();
         },
 
         error: (error) => {
 
-          console.error('Search error:', error);
+          console.error(
+            'Error loading patients:',
+            error
+          );
 
           this.isLoading = false;
-          this.errorMessage = 'Failed to search patient';
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Failed to load patients.';
 
           this.cdr.detectChanges();
         }
 
       });
   }
+
+
+  // =====================================================
+  // SEARCH / FILTER
+  // =====================================================
+
+  searchPatients(): void {
+
+    const query =
+      this.searchQuery
+        .trim()
+        .toLowerCase();
+
+
+    // Empty search → show all patients
+
+    if (!query) {
+
+      this.filteredPatients =
+        this.patients;
+
+      this.errorMessage = '';
+
+      this.cdr.detectChanges();
+
+      return;
+    }
+
+
+    // Filter by name OR phone
+
+    this.filteredPatients =
+      this.patients.filter(patient => {
+
+        const fullName =
+          `${patient.firstName} ${patient.lastName}`
+            .toLowerCase();
+
+        const phone =
+          patient.phone?.toLowerCase() || '';
+
+        return (
+          fullName.includes(query) ||
+          phone.includes(query)
+        );
+
+      });
+
+
+    if (this.filteredPatients.length === 0) {
+
+      this.errorMessage =
+        'No patient found matching your search.';
+
+    } else {
+
+      this.errorMessage = '';
+
+    }
+
+    this.cdr.detectChanges();
+  }
+
+
+  // =====================================================
+  // CLEAR SEARCH
+  // =====================================================
+
+  clearSearch(): void {
+
+    this.searchQuery = '';
+
+    this.filteredPatients =
+      this.patients;
+
+    this.errorMessage = '';
+
+    this.cdr.detectChanges();
+  }
+
 }

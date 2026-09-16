@@ -1,0 +1,290 @@
+<div class="max-w-5xl mx-auto p-6">
+
+  <button
+    type="button"
+    (click)="goBack()"
+    class="mb-6 text-blue-600
+           hover:text-blue-800
+           font-semibold cursor-pointer">
+
+    ← Back to Doctor
+
+  </button>
+
+
+  @if (isLoading()) {
+
+    <div class="bg-white rounded-2xl shadow-sm p-12 text-center">
+
+      <p class="text-gray-500">
+        Loading available appointments...
+      </p>
+
+    </div>
+
+  }
+
+  @else if (error() && !doctor()) {
+
+    <div
+      class="bg-red-50 border border-red-200
+             rounded-xl p-6 text-center">
+
+      <p class="text-red-600">
+        {{ error() }}
+      </p>
+
+    </div>
+
+  }
+
+  @else if (doctor(); as d) {
+
+    <!-- Doctor Header -->
+    <div
+      class="bg-white rounded-2xl
+             border border-gray-200
+             shadow-sm p-6 mb-6">
+
+      <div class="flex items-center gap-4">
+
+        <div
+          class="w-16 h-16 rounded-full
+                 bg-blue-100 text-blue-700
+                 flex items-center justify-center
+                 font-bold text-xl">
+
+          Dr
+
+        </div>
+
+        <div>
+
+          <h1 class="text-2xl font-bold text-gray-900">
+            Dr. {{ d.firstName }} {{ d.lastName }}
+          </h1>
+
+          <p class="text-gray-500">
+            {{ d.specialization }}
+          </p>
+
+          <span
+            class="inline-block mt-2
+                   bg-blue-50 text-blue-700
+                   px-3 py-1 rounded-full
+                   text-sm font-semibold">
+
+            {{ d.departmentName }}
+
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Booking Card -->
+    <div
+      class="bg-white rounded-2xl
+             border border-gray-200
+             shadow-sm p-6">
+
+      <h2 class="text-xl font-bold text-gray-900">
+        Make an Appointment
+      </h2>
+
+      <p class="text-gray-500 mt-1 mb-8">
+        Choose an available date and time.
+      </p>
+
+
+      <!-- Dates -->
+      <div>
+
+        <h3 class="font-semibold text-gray-800 mb-4">
+          1. Choose a Date
+        </h3>
+
+        @if (getAvailableDates().length > 0) {
+
+          <div class="flex flex-wrap gap-3">
+
+            @for (date of getAvailableDates(); track date) {
+
+              <button
+                type="button"
+                (click)="selectDate(date)"
+                [class]="
+                  selectedDate() === date
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500'
+                "
+                class="px-5 py-3 rounded-xl
+                       border font-semibold
+                       transition cursor-pointer">
+
+                {{ formatDate(date) }}
+
+              </button>
+
+            }
+
+          </div>
+
+        } @else {
+
+          <div
+            class="bg-gray-50 border border-dashed
+                   border-gray-300 rounded-xl p-6">
+
+            <p class="text-gray-500">
+              No available dates for this doctor.
+            </p>
+
+          </div>
+
+        }
+
+      </div>
+
+
+      <!-- Times -->
+      <div class="mt-8">
+
+        <h3 class="font-semibold text-gray-800 mb-4">
+          2. Choose a Time
+        </h3>
+
+        @if (getSlotsForSelectedDate().length > 0) {
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+
+            @for (
+              slot of getSlotsForSelectedDate();
+              track slot.id
+            ) {
+
+              <button
+                type="button"
+                (click)="selectSlot(slot)"
+                [class]="
+                  selectedSlot()?.id === slot.id
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-green-50 text-green-700 border-green-200 hover:border-blue-500'
+                "
+                class="px-4 py-3 rounded-xl
+                       border font-semibold
+                       transition cursor-pointer">
+
+                {{ formatTime(slot.startTime) }}
+                -
+                {{ formatTime(slot.endTime) }}
+
+              </button>
+
+            }
+
+          </div>
+
+        } @else {
+
+          <div
+            class="bg-gray-50 border border-dashed
+                   border-gray-300 rounded-xl p-6">
+
+            <p class="text-gray-500">
+              Select a date to see available times.
+            </p>
+
+          </div>
+
+        }
+
+      </div>
+
+
+      <!-- Selected Appointment -->
+      @if (selectedSlot(); as slot) {
+
+        <div
+          class="mt-8 bg-blue-50
+                 border border-blue-200
+                 rounded-xl p-6">
+
+          <h3 class="font-bold text-blue-900">
+            Appointment Summary
+          </h3>
+
+          <div class="mt-3 text-blue-800">
+
+            <p>
+              <strong>Doctor:</strong>
+              Dr. {{ d.firstName }} {{ d.lastName }}
+            </p>
+
+            <p class="mt-1">
+              <strong>Date:</strong>
+              {{ formatDate(slot.date) }}
+            </p>
+
+            <p class="mt-1">
+              <strong>Time:</strong>
+              {{ formatTime(slot.startTime) }}
+              -
+              {{ formatTime(slot.endTime) }}
+            </p>
+
+          </div>
+
+        </div>
+
+      }
+
+
+      <!-- Error -->
+      @if (error()) {
+
+        <div
+          class="mt-5 bg-red-50
+                 border border-red-200
+                 text-red-600
+                 rounded-xl p-4">
+
+          {{ error() }}
+
+        </div>
+
+      }
+
+
+      <!-- Confirm -->
+      <div class="mt-8 flex justify-end">
+
+        <button
+          type="button"
+          (click)="bookAppointment()"
+          [disabled]="!selectedSlot() || isBooking()"
+          class="bg-blue-600 hover:bg-blue-700
+                 disabled:bg-gray-300
+                 disabled:cursor-not-allowed
+                 text-white px-8 py-3
+                 rounded-xl font-semibold
+                 transition cursor-pointer">
+
+          @if (isBooking()) {
+            Booking...
+          } @else {
+            Confirm Appointment
+          }
+
+        </button>
+
+      </div>
+
+    </div>
+
+  }
+
+</div>

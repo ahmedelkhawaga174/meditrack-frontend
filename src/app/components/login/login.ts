@@ -111,9 +111,20 @@ export class Login {
 
           } else if (response.role === 'DOCTOR') {
 
+            // Use Doctor ID, not User ID
+            if (response.doctorId == null) {
+
+              this.showToast(
+                'Doctor profile was not found.',
+                'error'
+              );
+
+              return;
+            }
+
             this.router.navigate([
               '/doctor',
-              response.userId
+              response.doctorId
             ]);
 
           } else if (response.role === 'SUPER_ADMIN') {
@@ -142,4 +153,3 @@ export class Login {
     });
   }
 }
-

@@ -2,6 +2,8 @@ import { Component, inject, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
+import Swal from 'sweetalert2';
+
 import { PatientAppointment } from '../../models/patient-appointment';
 import { PatientAppointmentService } from '../../services/PatientAppointmentService';
 import { AppointmentService } from '../../services/appointment';
@@ -29,6 +31,7 @@ export class PatientAppointments {
   past = signal<PatientAppointment[]>([]);
 
   isLoading = signal(true);
+
   isCancelling = signal<number | null>(null);
 
   isRescheduling = signal<number | null>(null);
@@ -45,185 +48,435 @@ export class PatientAppointments {
   ngOnInit(): void {
     this.loadAppointments();
   }
-isPatient(): boolean {
-  return this.authService.getUser()?.role === 'PATIENT';
-}
+
+  isPatient(): boolean {
+    return this.authService.getUser()?.role === 'PATIENT';
+  }
+
+  // ==========================================
+  // LOAD APPOINTMENTS
+  // ==========================================
+
   loadAppointments(): void {
+
     this.isLoading.set(true);
     this.error.set('');
 
-    this.patientAppointmentService.getUpcoming(this.patientId()).subscribe({
-      next: (data) => {
-        this.upcoming.set(data);
-        this.loadPastAppointments();
-      },
-      error: () => {
-        this.error.set('Could not load upcoming appointments');
-        this.isLoading.set(false);
-      }
-    });
+    this.patientAppointmentService
+      .getUpcoming(this.patientId())
+      .subscribe({
+
+        next: (data) => {
+
+          this.upcoming.set(data);
+
+          this.loadPastAppointments();
+        },
+
+        error: (err) => {
+
+          console.error('Error loading upcoming appointments:', err);
+
+          this.error.set(
+            'Could not load upcoming appointments.'
+          );
+
+          this.isLoading.set(false);
+        }
+      });
   }
 
   private loadPastAppointments(): void {
-    this.patientAppointmentService.getPast(this.patientId()).subscribe({
-      next: (data) => {
-        this.past.set(data);
-        this.isLoading.set(false);
-      },
-      error: () => {
-        this.error.set('Could not load past appointments');
-        this.isLoading.set(false);
-      }
-    });
+
+    this.patientAppointmentService
+      .getPast(this.patientId())
+      .subscribe({
+
+        next: (data) => {
+
+          this.past.set(data);
+
+          this.isLoading.set(false);
+        },
+
+        error: (err) => {
+
+          console.error('Error loading past appointments:', err);
+
+          this.error.set(
+            'Could not load past appointments.'
+          );
+
+          this.isLoading.set(false);
+        }
+      });
   }
+
+  // ==========================================
+  // CANCEL APPOINTMENT
+  // ==========================================
 
   cancelAppointment(appointmentId: number): void {
 
-    const confirmed = confirm(
-      'Are you sure you want to cancel this appointment?'
-    );
+    Swal.fire({
 
-    if (!confirmed) {
-      return;
-    }
+      title: 'Cancel Appointment?',
 
-    this.isCancelling.set(appointmentId);
-    this.error.set('');
-    this.successMessage.set('');
+      text: 'Are you sure you want to cancel this appointment?',
 
-    this.appointmentService.cancelAppointment(appointmentId).subscribe({
-      next: () => {
-        this.isCancelling.set(null);
+      icon: 'warning',
 
-        this.successMessage.set(
-          'Appointment cancelled successfully.'
-        );
+      showCancelButton: true,
 
-        this.loadAppointments();
-      },
+      confirmButtonText: 'Yes, Cancel It',
 
-      error: (err) => {
-        console.error(err);
+      cancelButtonText: 'Keep Appointment',
 
-        this.isCancelling.set(null);
+      confirmButtonColor: '#dc2626',
 
-        this.error.set(
-          'Unable to cancel appointment. Please try again.'
-        );
+      cancelButtonColor: '#6b7280',
+
+      reverseButtons: true,
+
+      focusCancel: true
+
+    }).then((result) => {
+
+      if (!result.isConfirmed) {
+        return;
       }
+
+      this.isCancelling.set(appointmentId);
+
+      this.error.set('');
+      this.successMessage.set('');
+
+      this.appointmentService
+        .cancelAppointment(appointmentId)
+        .subscribe({
+
+          // ==============================
+          // CANCEL SUCCESS
+          // ==============================
+
+          next: () => {
+
+            this.isCancelling.set(null);
+
+            Swal.fire({
+
+              icon: 'success',
+
+              title: 'Appointment Cancelled!',
+
+              text: 'Your appointment has been cancelled successfully.',
+
+              confirmButtonText: 'OK',
+
+              confirmButtonColor: '#2563eb',
+
+              timer: 2500,
+
+              timerProgressBar: true
+
+            });
+
+            this.loadAppointments();
+          },
+
+          // ==============================
+          // CANCEL ERROR
+          // ==============================
+
+          error: (err) => {
+
+            console.error(
+              'Cancel appointment error:',
+              err
+            );
+
+            this.isCancelling.set(null);
+
+            Swal.fire({
+
+              icon: 'error',
+
+              title: 'Cancellation Failed',
+
+              text:
+                err?.error?.message ||
+                'Unable to cancel the appointment. Please try again.',
+
+              confirmButtonText: 'OK',
+
+              confirmButtonColor: '#2563eb'
+            });
+          }
+        });
     });
   }
+
+  // ==========================================
+  // START RESCHEDULE
+  // ==========================================
 
   startReschedule(appointmentId: number): void {
 
     this.isRescheduling.set(appointmentId);
+
     this.isLoadingSlots.set(true);
 
     this.selectedNewSlotId.set(null);
+
     this.availableSlots.set([]);
 
     this.error.set('');
     this.successMessage.set('');
 
-    this.appointmentService.getAppointment(appointmentId).subscribe({
-      next: (appointment) => {
+    this.appointmentService
+      .getAppointment(appointmentId)
+      .subscribe({
 
-        this.doctorService.getDoctorById(appointment.doctorId).subscribe({
-          next: (doctor) => {
-            this.availableSlots.set(doctor.availableSlots);
-            this.isLoadingSlots.set(false);
-          },
+        next: (appointment) => {
 
-          error: (err) => {
-            console.error(err);
+          this.doctorService
+            .getDoctorById(appointment.doctorId)
+            .subscribe({
 
-            this.error.set(
-              'Unable to load available slots.'
-            );
+              next: (doctor) => {
 
-            this.isLoadingSlots.set(false);
-            this.isRescheduling.set(null);
-          }
-        });
+                this.availableSlots.set(
+                  doctor.availableSlots
+                );
 
-      },
+                this.isLoadingSlots.set(false);
+              },
 
-      error: (err) => {
-        console.error(err);
+              error: (err) => {
 
-        this.error.set(
-          'Unable to load appointment details.'
-        );
+                console.error(
+                  'Error loading doctor slots:',
+                  err
+                );
 
-        this.isLoadingSlots.set(false);
-        this.isRescheduling.set(null);
-      }
-    });
+                this.error.set(
+                  'Unable to load available slots.'
+                );
+
+                this.isLoadingSlots.set(false);
+
+                this.isRescheduling.set(null);
+              }
+            });
+        },
+
+        error: (err) => {
+
+          console.error(
+            'Error loading appointment:',
+            err
+          );
+
+          this.error.set(
+            'Unable to load appointment details.'
+          );
+
+          this.isLoadingSlots.set(false);
+
+          this.isRescheduling.set(null);
+        }
+      });
   }
+
+  // ==========================================
+  // SELECT NEW SLOT
+  // ==========================================
 
   selectNewSlot(slotId: number): void {
+
     this.selectedNewSlotId.set(slotId);
+
+    this.error.set('');
   }
+
+  // ==========================================
+  // CONFIRM RESCHEDULE
+  // ==========================================
 
   confirmReschedule(appointmentId: number): void {
 
     const newSlotId = this.selectedNewSlotId();
 
     if (!newSlotId) {
-      this.error.set('Please select a new slot.');
+
+      Swal.fire({
+
+        icon: 'warning',
+
+        title: 'Select a Slot',
+
+        text: 'Please select a new appointment slot first.',
+
+        confirmButtonText: 'OK',
+
+        confirmButtonColor: '#2563eb'
+      });
+
       return;
     }
 
-    this.isLoadingSlots.set(true);
-    this.error.set('');
-    this.successMessage.set('');
+    // Confirmation before reschedule
 
-    this.appointmentService
-      .rescheduleAppointment(appointmentId, newSlotId)
-      .subscribe({
-        next: () => {
+    Swal.fire({
 
-          this.isLoadingSlots.set(false);
-          this.isRescheduling.set(null);
-          this.selectedNewSlotId.set(null);
-          this.availableSlots.set([]);
+      title: 'Reschedule Appointment?',
 
-          this.successMessage.set(
-            'Appointment rescheduled successfully.'
-          );
+      text: 'Do you want to move your appointment to the selected slot?',
 
-          this.loadAppointments();
-        },
+      icon: 'question',
 
-        error: (err) => {
-          console.error(err);
+      showCancelButton: true,
 
-          this.isLoadingSlots.set(false);
+      confirmButtonText: 'Yes, Reschedule',
 
-          if (err.status === 409) {
-            this.error.set(
-              'The selected slot is already booked.'
+      cancelButtonText: 'Go Back',
+
+      confirmButtonColor: '#2563eb',
+
+      cancelButtonColor: '#6b7280',
+
+      reverseButtons: true
+
+    }).then((result) => {
+
+      if (!result.isConfirmed) {
+        return;
+      }
+
+      this.isLoadingSlots.set(true);
+
+      this.error.set('');
+      this.successMessage.set('');
+
+      this.appointmentService
+        .rescheduleAppointment(
+          appointmentId,
+          newSlotId
+        )
+        .subscribe({
+
+          // ==============================
+          // RESCHEDULE SUCCESS
+          // ==============================
+
+          next: () => {
+
+            this.isLoadingSlots.set(false);
+
+            this.isRescheduling.set(null);
+
+            this.selectedNewSlotId.set(null);
+
+            this.availableSlots.set([]);
+
+            Swal.fire({
+
+              icon: 'success',
+
+              title: 'Appointment Rescheduled! 📅',
+
+              text: 'Your appointment has been rescheduled successfully.',
+
+              confirmButtonText: 'OK',
+
+              confirmButtonColor: '#2563eb',
+
+              timer: 2500,
+
+              timerProgressBar: true
+            });
+
+            this.loadAppointments();
+          },
+
+          // ==============================
+          // RESCHEDULE ERROR
+          // ==============================
+
+          error: (err) => {
+
+            console.error(
+              'Reschedule appointment error:',
+              err
             );
-          } else {
-            this.error.set(
-              'Unable to reschedule appointment. Please try again.'
-            );
+
+            this.isLoadingSlots.set(false);
+
+            if (err.status === 409) {
+
+              Swal.fire({
+
+                icon: 'warning',
+
+                title: 'Slot Already Booked',
+
+                text: 'The selected slot is no longer available. Please choose another slot.',
+
+                confirmButtonText: 'Choose Another',
+
+                confirmButtonColor: '#2563eb'
+              });
+
+            } else {
+
+              Swal.fire({
+
+                icon: 'error',
+
+                title: 'Reschedule Failed',
+
+                text:
+                  err?.error?.message ||
+                  'Unable to reschedule the appointment. Please try again.',
+
+                confirmButtonText: 'OK',
+
+                confirmButtonColor: '#2563eb'
+              });
+            }
           }
-        }
-      });
+        });
+    });
   }
+
+  // ==========================================
+  // CANCEL RESCHEDULE MODE
+  // ==========================================
 
   cancelReschedule(): void {
+
     this.isRescheduling.set(null);
+
     this.selectedNewSlotId.set(null);
+
     this.availableSlots.set([]);
+
     this.isLoadingSlots.set(false);
+
+    this.error.set('');
   }
 
+  // ==========================================
+  // STATUS COLORS
+  // ==========================================
+
   statusClasses(status: string): string {
-    const base = 'text-xs px-2.5 py-0.5 rounded-full font-semibold';
+
+    const base =
+      'text-xs px-2.5 py-0.5 rounded-full font-semibold';
 
     switch (status) {
+
       case 'PENDING':
         return `${base} bg-yellow-100 text-yellow-800`;
 

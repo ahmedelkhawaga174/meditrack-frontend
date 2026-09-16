@@ -6,6 +6,7 @@ export interface LoginRequest {
 export interface LoginResponse {
   userId: number;
   patientId: number | null;
+  doctorId: number | null;
   phone: string;
   role: string;
   lastLoginAt: string;

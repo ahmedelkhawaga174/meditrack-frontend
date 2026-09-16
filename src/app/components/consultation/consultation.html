@@ -1,8 +1,10 @@
 <div class="p-6 bg-slate-50 min-h-screen">
+
   <div class="max-w-4xl mx-auto space-y-6">
 
     <!-- Header -->
     <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+
       <div>
         <h1 class="text-2xl font-bold text-slate-900">
           Patient Consultation Session
@@ -21,56 +23,58 @@
             : 'bg-amber-100 text-amber-800'
         "
       >
-        Status: {{ isCompleted() ? 'COMPLETED' : 'IN PROGRESS' }}
+        Status:
+        {{ isCompleted() ? 'COMPLETED' : 'IN PROGRESS' }}
       </span>
+
     </div>
 
 
-    <!-- Consultation Success Message -->
+    <!-- Consultation Success -->
     @if (successMessage()) {
-      <div
-        class="p-4 text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center space-x-2"
-      >
-        <svg
-          class="w-5 h-5 text-emerald-500 flex-shrink-0"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M5 13l4 4L19 7"
-          />
-        </svg>
 
-        <span>{{ successMessage() }}</span>
+      <div
+        class="p-4 text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg"
+      >
+        {{ successMessage() }}
       </div>
+
     }
 
 
-    <!-- Consultation Error Message -->
+    <!-- Consultation Error -->
     @if (errorMessage()) {
-      <div
-        class="p-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-2"
-      >
-        <svg
-          class="w-5 h-5 text-red-500 flex-shrink-0"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
 
-        <span>{{ errorMessage() }}</span>
+      <div
+        class="p-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg"
+      >
+        {{ errorMessage() }}
       </div>
+
+    }
+
+
+    <!-- Diagnosis Success -->
+    @if (diagnosisSuccessMessage()) {
+
+      <div
+        class="p-4 text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg"
+      >
+        {{ diagnosisSuccessMessage() }}
+      </div>
+
+    }
+
+
+    <!-- Diagnosis Error -->
+    @if (diagnosisErrorMessage()) {
+
+      <div
+        class="p-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg"
+      >
+        {{ diagnosisErrorMessage() }}
+      </div>
+
     }
 
 
@@ -78,6 +82,7 @@
     <div
       class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between text-xs text-slate-600"
     >
+
       <div>
         <span class="font-semibold text-slate-400 uppercase block">
           Appointment ID
@@ -88,9 +93,11 @@
         </span>
       </div>
 
+
       @if (savedConsultation()) {
 
         <div>
+
           <span class="font-semibold text-slate-400 uppercase block">
             Patient
           </span>
@@ -98,9 +105,12 @@
           <span class="font-medium text-slate-800">
             {{ savedConsultation()?.patientName }}
           </span>
+
         </div>
 
+
         <div>
+
           <span class="font-semibold text-slate-400 uppercase block">
             Doctor
           </span>
@@ -108,65 +118,60 @@
           <span class="font-medium text-slate-800">
             {{ savedConsultation()?.doctorName }}
           </span>
+
         </div>
 
       }
+
     </div>
 
 
-    <!-- Completed Consultation -->
-    @if (isCompleted() && savedConsultation()) {
+    <!-- ==================== CONSULTATION FORM ==================== -->
 
-      <div
-        class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-5"
-      >
-
-        <h2
-          class="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2"
-        >
-          Recorded Consultation Details
-        </h2>
-
-
-        <!-- Notes -->
-        <div>
-
-          <label
-            class="block text-xs font-semibold text-slate-400 uppercase mb-1"
-          >
-            Clinical Notes & Medical Assessment
-          </label>
-
-          <div
-            class="p-4 bg-slate-50 rounded-lg border border-slate-200 text-sm text-slate-800 whitespace-pre-wrap"
-          >
-            {{ savedConsultation()?.notes }}
-          </div>
-
-        </div>
-
-
-        <!-- Created At -->
-        <div class="text-xs text-slate-400">
-          Recorded at:
-          {{ savedConsultation()?.createdAt | date:'medium' }}
-        </div>
-
-      </div>
-
-    }
-
-
-    <!-- Consultation + Prescription -->
     @if (!isCompleted()) {
-
-      <!-- ==================== CONSULTATION FORM ==================== -->
 
       <form
         [formGroup]="consultationForm"
         (ngSubmit)="onSubmit()"
         class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6"
       >
+
+        <div>
+
+          <label
+            for="diagnosis"
+            class="block text-sm font-semibold text-slate-700 mb-2"
+          >
+            Diagnosis *
+          </label>
+
+          <input
+            id="diagnosis"
+            type="text"
+            formControlName="diagnosis"
+            placeholder="e.g. Acute bronchitis"
+            class="w-full p-3 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+            [class.border-red-500]="
+              consultationForm.get('diagnosis')?.invalid &&
+              consultationForm.get('diagnosis')?.touched
+            "
+          />
+
+          @if (
+            consultationForm.get('diagnosis')?.invalid &&
+            consultationForm.get('diagnosis')?.touched
+          ) {
+
+            <p class="mt-1 text-xs text-red-600">
+              Diagnosis is required (minimum 3 characters).
+            </p>
+
+          }
+
+        </div>
+
+
+        <!-- Notes -->
 
         <div>
 
@@ -181,7 +186,7 @@
             id="notes"
             formControlName="notes"
             rows="6"
-            placeholder="Enter diagnosis, symptoms, examination findings, and follow-up advice..."
+            placeholder="Enter symptoms, examination findings, clinical assessment, and follow-up advice..."
             class="w-full p-3 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
             [class.border-red-500]="
               consultationForm.get('notes')?.invalid &&
@@ -204,7 +209,8 @@
         </div>
 
 
-        <!-- Consultation Submit -->
+        <!-- Submit -->
+
         <div
           class="flex justify-end pt-4 border-t border-slate-100"
         >
@@ -213,12 +219,16 @@
             type="submit"
             [disabled]="
               isSubmitting() ||
+              isDiagnosisSubmitting() ||
               consultationForm.invalid
             "
             class="px-6 py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 rounded-lg transition-colors flex items-center space-x-2"
           >
 
-            @if (isSubmitting()) {
+            @if (
+              isSubmitting() ||
+              isDiagnosisSubmitting()
+            ) {
 
               <span
                 class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"
@@ -242,268 +252,316 @@
 
       </form>
 
+    }
 
-      <!-- ==================== PRESCRIPTION FORM ==================== -->
 
-      <form
-        [formGroup]="prescriptionForm"
-        (ngSubmit)="onSubmitPrescription()"
-        class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6"
+    <!-- ==================== RECORDED CONSULTATION ==================== -->
+
+    @if (isCompleted() && savedConsultation()) {
+
+      <div
+        class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-5"
       >
 
-        <!-- Prescription Header -->
-        <div class="border-b border-slate-100 pb-4">
-
-          <h2 class="text-lg font-bold text-slate-800">
-            Prescription
-          </h2>
-
-          <p class="text-sm text-slate-500 mt-1">
-            Add medication details for the patient.
-          </p>
-
-        </div>
-
-
-        <!-- Prescription Success -->
-        @if (prescriptionSuccessMessage()) {
-
-          <div
-            class="p-4 text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg"
-          >
-            {{ prescriptionSuccessMessage() }}
-          </div>
-
-        }
-
-
-        <!-- Prescription Error -->
-        @if (prescriptionErrorMessage()) {
-
-          <div
-            class="p-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg"
-          >
-            {{ prescriptionErrorMessage() }}
-          </div>
-
-        }
-
-
-        <!-- Prescription Fields -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-
-          <!-- Medication Name -->
-          <div>
-
-            <label
-              for="medicationName"
-              class="block text-sm font-semibold text-slate-700 mb-2"
-            >
-              Medication *
-            </label>
-
-            <input
-              id="medicationName"
-              type="text"
-              formControlName="medicationName"
-              placeholder="e.g. Panadol"
-              class="w-full p-3 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-              [class.border-red-500]="
-                prescriptionForm.get('medicationName')?.invalid &&
-                prescriptionForm.get('medicationName')?.touched
-              "
-            />
-
-            @if (
-              prescriptionForm.get('medicationName')?.invalid &&
-              prescriptionForm.get('medicationName')?.touched
-            ) {
-
-              <p class="mt-1 text-xs text-red-600">
-                Medication name is required.
-              </p>
-
-            }
-
-          </div>
-
-
-          <!-- Dosage -->
-          <div>
-
-            <label
-              for="dosage"
-              class="block text-sm font-semibold text-slate-700 mb-2"
-            >
-              Dosage *
-            </label>
-
-            <input
-              id="dosage"
-              type="text"
-              formControlName="dosage"
-              placeholder="e.g. 500 mg"
-              class="w-full p-3 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-              [class.border-red-500]="
-                prescriptionForm.get('dosage')?.invalid &&
-                prescriptionForm.get('dosage')?.touched
-              "
-            />
-
-            @if (
-              prescriptionForm.get('dosage')?.invalid &&
-              prescriptionForm.get('dosage')?.touched
-            ) {
-
-              <p class="mt-1 text-xs text-red-600">
-                Dosage is required.
-              </p>
-
-            }
-
-          </div>
-
-
-          <!-- Frequency -->
-          <div>
-
-            <label
-              for="frequency"
-              class="block text-sm font-semibold text-slate-700 mb-2"
-            >
-              Frequency *
-            </label>
-
-            <select
-              id="frequency"
-              formControlName="frequency"
-              class="w-full p-3 text-sm rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-              [class.border-red-500]="
-                prescriptionForm.get('frequency')?.invalid &&
-                prescriptionForm.get('frequency')?.touched
-              "
-            >
-
-              <option value="">
-                Select frequency
-              </option>
-
-              <option value="ONCE_DAILY">
-                Once daily
-              </option>
-
-              <option value="TWICE_DAILY">
-                Twice daily
-              </option>
-
-              <option value="THREE_TIMES_DAILY">
-                Three times daily
-              </option>
-
-              <option value="FOUR_TIMES_DAILY">
-                Four times daily
-              </option>
-
-              <option value="AS_NEEDED">
-                As needed
-              </option>
-
-            </select>
-
-
-            @if (
-              prescriptionForm.get('frequency')?.invalid &&
-              prescriptionForm.get('frequency')?.touched
-            ) {
-
-              <p class="mt-1 text-xs text-red-600">
-                Frequency is required.
-              </p>
-
-            }
-
-          </div>
-
-
-          <!-- Duration -->
-          <div>
-
-            <label
-              for="duration"
-              class="block text-sm font-semibold text-slate-700 mb-2"
-            >
-              Duration *
-            </label>
-
-            <input
-              id="duration"
-              type="text"
-              formControlName="duration"
-              placeholder="e.g. 5 days"
-              class="w-full p-3 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-              [class.border-red-500]="
-                prescriptionForm.get('duration')?.invalid &&
-                prescriptionForm.get('duration')?.touched
-              "
-            />
-
-            @if (
-              prescriptionForm.get('duration')?.invalid &&
-              prescriptionForm.get('duration')?.touched
-            ) {
-
-              <p class="mt-1 text-xs text-red-600">
-                Duration is required.
-              </p>
-
-            }
-
-          </div>
-
-        </div>
-
-
-        <!-- Prescription Submit -->
-        <div
-          class="flex justify-end pt-4 border-t border-slate-100"
+        <h2
+          class="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2"
         >
+          Recorded Consultation Details
+        </h2>
 
-          <button
-            type="submit"
-            [disabled]="
-              isPrescriptionSubmitting() ||
-              prescriptionForm.invalid
-            "
-            class="px-6 py-2.5 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded-lg transition-colors flex items-center space-x-2"
+
+        <!-- Diagnosis -->
+
+        <div>
+
+          <label
+            class="block text-xs font-semibold text-slate-400 uppercase mb-1"
           >
+            Diagnosis
+          </label>
 
-            @if (isPrescriptionSubmitting()) {
-
-              <span
-                class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"
-              ></span>
-
-              <span>
-                Issuing Prescription...
-              </span>
-
-            } @else {
-
-              <span>
-                Issue Prescription
-              </span>
-
-            }
-
-          </button>
+          <div
+            class="p-4 bg-slate-50 rounded-lg border border-slate-200 text-sm text-slate-800"
+          >
+            {{ consultationForm.value.diagnosis }}
+          </div>
 
         </div>
 
-      </form>
+
+        <!-- Notes -->
+
+        <div>
+
+          <label
+            class="block text-xs font-semibold text-slate-400 uppercase mb-1"
+          >
+            Clinical Notes & Medical Assessment
+          </label>
+
+          <div
+            class="p-4 bg-slate-50 rounded-lg border border-slate-200 text-sm text-slate-800 whitespace-pre-wrap"
+          >
+            {{ savedConsultation()?.notes }}
+          </div>
+
+        </div>
+
+
+        <!-- Created At -->
+
+        <div class="text-xs text-slate-400">
+
+          Recorded at:
+          {{ savedConsultation()?.createdAt | date:'medium' }}
+
+        </div>
+
+      </div>
 
     }
 
+
+    <!-- ==================== PRESCRIPTION ==================== -->
+
+    <form
+      [formGroup]="prescriptionForm"
+      (ngSubmit)="onSubmitPrescription()"
+      class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6"
+    >
+
+      <!-- Header -->
+
+      <div class="border-b border-slate-100 pb-4">
+
+        <h2 class="text-lg font-bold text-slate-800">
+          Prescription
+        </h2>
+
+        <p class="text-sm text-slate-500 mt-1">
+          Add medication details for the patient.
+        </p>
+
+      </div>
+
+
+      <!-- Success -->
+
+      @if (prescriptionSuccessMessage()) {
+
+        <div
+          class="p-4 text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg"
+        >
+          {{ prescriptionSuccessMessage() }}
+        </div>
+
+      }
+
+
+      <!-- Error -->
+
+      @if (prescriptionErrorMessage()) {
+
+        <div
+          class="p-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg"
+        >
+          {{ prescriptionErrorMessage() }}
+        </div>
+
+      }
+
+
+      <!-- Fields -->
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+        <!-- Medication -->
+
+        <div>
+
+          <label
+            for="medicationName"
+            class="block text-sm font-semibold text-slate-700 mb-2"
+          >
+            Medication *
+          </label>
+
+          <input
+            id="medicationName"
+            type="text"
+            formControlName="medicationName"
+            placeholder="e.g. Panadol"
+            class="w-full p-3 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+            [class.border-red-500]="
+              prescriptionForm.get('medicationName')?.invalid &&
+              prescriptionForm.get('medicationName')?.touched
+            "
+          />
+
+          @if (
+            prescriptionForm.get('medicationName')?.invalid &&
+            prescriptionForm.get('medicationName')?.touched
+          ) {
+
+            <p class="mt-1 text-xs text-red-600">
+              Medication name is required.
+            </p>
+
+          }
+
+        </div>
+
+
+        <!-- Dosage -->
+
+        <div>
+
+          <label
+            for="dosage"
+            class="block text-sm font-semibold text-slate-700 mb-2"
+          >
+            Dosage *
+          </label>
+
+          <input
+            id="dosage"
+            type="text"
+            formControlName="dosage"
+            placeholder="e.g. 500 mg"
+            class="w-full p-3 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+            [class.border-red-500]="
+              prescriptionForm.get('dosage')?.invalid &&
+              prescriptionForm.get('dosage')?.touched
+            "
+          />
+
+          @if (
+            prescriptionForm.get('dosage')?.invalid &&
+            prescriptionForm.get('dosage')?.touched
+          ) {
+
+            <p class="mt-1 text-xs text-red-600">
+              Dosage is required.
+            </p>
+
+          }
+
+        </div>
+
+
+        <!-- Frequency -->
+
+        <div>
+
+          <label
+            for="frequency"
+            class="block text-sm font-semibold text-slate-700 mb-2"
+          >
+            Frequency *
+          </label>
+
+          <select
+            id="frequency"
+            formControlName="frequency"
+            class="w-full p-3 text-sm rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+          >
+
+            <option value="">
+              Select frequency
+            </option>
+
+            <option value="ONCE_DAILY">
+              Once daily
+            </option>
+
+            <option value="TWICE_DAILY">
+              Twice daily
+            </option>
+
+            <option value="THREE_TIMES_DAILY">
+              Three times daily
+            </option>
+
+            <option value="FOUR_TIMES_DAILY">
+              Four times daily
+            </option>
+
+            <option value="AS_NEEDED">
+              As needed
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- Duration -->
+
+        <div>
+
+          <label
+            for="duration"
+            class="block text-sm font-semibold text-slate-700 mb-2"
+          >
+            Duration *
+          </label>
+
+          <input
+            id="duration"
+            type="text"
+            formControlName="duration"
+            placeholder="e.g. 5 days"
+            class="w-full p-3 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+            [class.border-red-500]="
+              prescriptionForm.get('duration')?.invalid &&
+              prescriptionForm.get('duration')?.touched
+            "
+          />
+
+        </div>
+
+      </div>
+
+
+      <!-- Prescription Submit -->
+
+      <div
+        class="flex justify-end pt-4 border-t border-slate-100"
+      >
+
+        <button
+          type="submit"
+          [disabled]="
+            isPrescriptionSubmitting() ||
+            prescriptionForm.invalid
+          "
+          class="px-6 py-2.5 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded-lg transition-colors flex items-center space-x-2"
+        >
+
+          @if (isPrescriptionSubmitting()) {
+
+            <span
+              class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"
+            ></span>
+
+            <span>
+              Issuing Prescription...
+            </span>
+
+          } @else {
+
+            <span>
+              Issue Prescription
+            </span>
+
+          }
+
+        </button>
+
+      </div>
+
+    </form>
+
   </div>
+
 </div>
-```
